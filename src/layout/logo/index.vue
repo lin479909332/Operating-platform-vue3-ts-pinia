@@ -9,7 +9,11 @@
 import setting from '@/setting'
 import {} from 'vue'
 </script>
-
+<script lang="ts">
+export default {
+  name: 'Logo',
+}
+</script>
 <style lang="scss" scoped>
 .logo {
   width: 100%;
@@ -17,10 +21,9 @@ import {} from 'vue'
   color: white;
   display: flex;
   align-items: center;
-  padding: 20px;
   img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
   }
   p {

@@ -10,7 +10,11 @@
 <script lang="ts" setup>
 import {} from 'vue'
 </script>
-
+<script lang="ts">
+export default {
+  name: 'Main',
+}
+</script>
 <style lang="scss" scoped>
 .fade-enter-from {
   opacity: 0;
