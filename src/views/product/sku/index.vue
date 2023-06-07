@@ -1,12 +1,9 @@
 <template>
-<div>sku</div>
+  <div>sku</div>
 </template>
 
-<script lang='ts' setup>
-import { } from 'vue'
-
+<script lang="ts" setup>
+import {} from 'vue'
 </script>
- 
-<style lang="less" scoped>
-  
-</style>
+
+<style lang="less" scoped></style>
