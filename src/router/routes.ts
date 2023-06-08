@@ -21,10 +21,10 @@ export const constantRoute = [
     name: 'layout',
     meta: {
       // 菜单标题
-      title: 'layout',
+      title: '',
       // 是否要在菜单里隐藏
       hidden: false,
-      icon: 'Operation',
+      icon: '',
     },
     redirect: '/home',
     children: [
@@ -84,6 +84,7 @@ export const constantRoute = [
       hidden: false,
       icon: 'Lock',
     },
+    redirect:'/acl/user',
     children: [
       {
         path: '/acl/user',
