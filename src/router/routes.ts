@@ -84,7 +84,7 @@ export const constantRoute = [
       hidden: false,
       icon: 'Lock',
     },
-    redirect:'/acl/user',
+    redirect: '/acl/user',
     children: [
       {
         path: '/acl/user',
