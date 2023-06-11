@@ -27,7 +27,6 @@ import { useRoute } from 'vue-router'
 import useLayoutSettingStore from '@/store/modules/setting'
 const layoutSettingStore = useLayoutSettingStore()
 const $route = useRoute()
-console.log($route.matched)
 
 const changeIcon = () => {
   layoutSettingStore.fold = !layoutSettingStore.fold

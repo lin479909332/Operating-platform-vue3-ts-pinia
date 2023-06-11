@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import type { loginForm, loginResponseData } from '@/api/user/type'
 import type { UserState } from '@/store/modules/types/type'
 // 引入登录接口
-import { reqLogin } from '@/api/user/index'
+import { reqLogin, reqUserInfo } from '@/api/user/index'
 // 存储 读取token的方法
 import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
 // 引入路由（常量路由）
@@ -19,6 +19,10 @@ let useUserStore = defineStore('User', {
       token: GET_TOKEN(),
       // 仓库存储生成菜单需要数组（路由)
       menusRoutes: constantRoute,
+      // 用户名
+      username: '',
+      // 用户头像
+      avatar: '',
     }
   },
   // 处理异步或逻辑的地方
@@ -35,6 +39,15 @@ let useUserStore = defineStore('User', {
       } else {
         // 能保证当前async函数返回一个失败的promise
         return Promise.reject(new Error(result.data.message))
+      }
+    },
+    // 获取用户信息的方法
+    async userInfo() {
+      let result = await reqUserInfo()
+      if (result.code == 200) {
+        this.username = result.data.checkUser.username
+        this.avatar = result.data.checkUser.avatar
+      } else {
       }
     },
   },

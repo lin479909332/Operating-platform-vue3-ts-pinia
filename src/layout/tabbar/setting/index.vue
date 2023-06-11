@@ -13,12 +13,12 @@
   ></el-button>
   <el-button circle size="small" icon="Setting"></el-button>
   <img
-    src="../../../../public/logo.jpg"
+    :src="userStore.avatar"
     style="height: 24px; width: 24px; border-radius: 50%; margin: 0 10px"
   />
   <el-dropdown>
     <span class="el-dropdown-link">
-      admin
+      {{ userStore.username }}
       <el-icon class="el-icon--right">
         <arrow-down />
       </el-icon>
@@ -34,7 +34,9 @@
 <script lang="ts" setup>
 import {} from 'vue'
 import useLayoutSettingStore from '@/store/modules/setting'
+import useUserStore from '@/store/modules/user'
 let layoutSettingStore = useLayoutSettingStore()
+let userStore = useUserStore()
 // 用户点击刷新按钮后修改仓库里的值
 const updateRefresh = () => {
   layoutSettingStore.refresh = !layoutSettingStore.refresh
