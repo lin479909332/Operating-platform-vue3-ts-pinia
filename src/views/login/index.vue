@@ -3,19 +3,11 @@
     <el-row>
       <el-col :span="12" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
-        <el-form
-          class="login_form"
-          :model="loginForm"
-          :rules="rules"
-          ref="loginForms"
-        >
+        <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
           <h1>Hello</h1>
           <h2>欢迎来带甄选管理平台</h2>
           <el-form-item prop="username">
-            <el-input
-              :prefix-icon="User"
-              v-model="loginForm.username"
-            ></el-input>
+            <el-input :prefix-icon="User" v-model="loginForm.username"></el-input>
           </el-form-item>
           <el-form-item prop="password">
             <el-input
@@ -26,12 +18,7 @@
             ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button
-              :loading="loading"
-              class="login_btn"
-              type="primary"
-              @click="login"
-            >
+            <el-button :loading="loading" class="login_btn" type="primary" @click="login">
               登录
             </el-button>
           </el-form-item>
@@ -57,7 +44,7 @@ const loginForms = ref()
 // 收集账号密码
 const loginForm = reactive({
   username: 'admin',
-  password: '111111',
+  password: 'atguigu123',
 })
 // 按钮的加载效果
 let loading = ref(false)
@@ -94,7 +81,7 @@ const validatorUserName = (rule: any, value: any, callback: any) => {
     callback()
   } else {
     callback(new Error('用户名需在5-20位之间'))
-    console.log(rule)
+    console.log('防止警告的废话打印', rule)
   }
 }
 // 密码校验
@@ -103,7 +90,7 @@ const validatorPassword = (rule: any, value: any, callback: any) => {
     callback()
   } else {
     callback(new Error('密码需在6-20位之间'))
-    console.log(rule)
+    console.log('防止警告的废话打印', rule)
   }
 }
 // 校验规则

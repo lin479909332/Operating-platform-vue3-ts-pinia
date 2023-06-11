@@ -1,16 +1,6 @@
 <template>
-  <el-button
-    circle
-    size="small"
-    icon="Refresh"
-    @click="updateRefresh"
-  ></el-button>
-  <el-button
-    circle
-    size="small"
-    icon="FullScreen"
-    @click="fullScreen"
-  ></el-button>
+  <el-button circle size="small" icon="Refresh" @click="updateRefresh"></el-button>
+  <el-button circle size="small" icon="FullScreen" @click="fullScreen"></el-button>
   <el-button circle size="small" icon="Setting"></el-button>
   <img
     :src="userStore.avatar"
@@ -60,10 +50,10 @@ const fullScreen = () => {
   }
 }
 // 点击退出登录
-const logout = () => {
+const logout = async () => {
   //1、需要向服务器发请求[退出登录接口](没这个接口省略)
   //2、仓库当中关于用于相关的数据清空[ token|username|avatar]
-  userStore.userLogout()
+  await userStore.userLogout()
   //3、跳转到登录页面,同时把退出前的path作为query传入
   $router.push({ path: '/login', query: { redirect: $route.path } })
 }
