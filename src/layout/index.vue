@@ -1,10 +1,7 @@
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
-    <div
-      class="layout_slider"
-      :class="{ fold: layoutSettingStore.fold ? true : false }"
-    >
+    <div class="layout_slider" :class="{ fold: layoutSettingStore.fold ? true : false }">
       <Logo></Logo>
       <!-- 滚动条 -->
       <el-scrollbar class="scrollbar">
@@ -21,17 +18,11 @@
       </el-scrollbar>
     </div>
     <!--顶部导航-->
-    <div
-      class="layout_tabbar"
-      :class="{ fold: layoutSettingStore.fold ? true : false }"
-    >
+    <div class="layout_tabbar" :class="{ fold: layoutSettingStore.fold ? true : false }">
       <Tabbar></Tabbar>
     </div>
     <!--内容展示区域-->
-    <div
-      class="layout_main"
-      :class="{ fold: layoutSettingStore.fold ? true : false }"
-    >
+    <div class="layout_main" :class="{ fold: layoutSettingStore.fold ? true : false }">
       <Main></Main>
     </div>
   </div>
