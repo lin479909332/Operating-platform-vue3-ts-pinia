@@ -15,7 +15,6 @@ let userStore = useUserStore(pinia)
 // 全局前置守卫
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
-  console.log('防止警告的废话打印', from)
   nprogress.start()
   // 获取用户token判断用户是否登录
   let token = userStore.token
@@ -55,7 +54,5 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
 
 // 全局后置守卫
 router.afterEach((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
-  console.log('防止警告的废话打印', to)
-  console.log('防止警告的废话打印', from)
   nprogress.done()
 })

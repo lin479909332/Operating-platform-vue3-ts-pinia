@@ -76,21 +76,19 @@ const login = async () => {
   }
 }
 // 用户名校验
-const validatorUserName = (rule: any, value: any, callback: any) => {
+const validatorUserName = (_rule: any, value: any, callback: any) => {
   if (value.length >= 5 && value.length <= 20) {
     callback()
   } else {
     callback(new Error('用户名需在5-20位之间'))
-    console.log('防止警告的废话打印', rule)
   }
 }
 // 密码校验
-const validatorPassword = (rule: any, value: any, callback: any) => {
+const validatorPassword = (_rule: any, value: any, callback: any) => {
   if (value.length >= 6 && value.length <= 20) {
     callback()
   } else {
     callback(new Error('密码需在6-20位之间'))
-    console.log('防止警告的废话打印', rule)
   }
 }
 // 校验规则
