@@ -48,7 +48,7 @@ import { ElNotification } from 'element-plus'
 // 引入用户仓库
 import useUserStore from '@/store/modules/user'
 // 引入路由
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 // 引入获取时间的函数
 import { getTime } from '@/utils/time'
 let useStore = useUserStore()
@@ -63,6 +63,8 @@ const loginForm = reactive({
 let loading = ref(false)
 // 创建路由器
 let $router = useRouter()
+// 获取路由对象
+let $route = useRoute()
 // 登录按钮
 const login = async () => {
   //保证全部表单相校验通过再发请求
@@ -70,7 +72,8 @@ const login = async () => {
   loading.value = true
   try {
     await useStore.userLogin(loginForm)
-    $router.push('/')
+    let redirect: any = $route.query.redirect
+    $router.push({ path: redirect || '/' })
     ElNotification({
       type: 'success',
       message: '欢迎回来',

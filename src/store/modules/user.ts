@@ -6,7 +6,7 @@ import type { UserState } from '@/store/modules/types/type'
 // 引入登录接口
 import { reqLogin, reqUserInfo } from '@/api/user/index'
 // 存储 读取token的方法
-import { SET_TOKEN, GET_TOKEN } from '@/utils/token'
+import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
 // 引入路由（常量路由）
 import { constantRoute } from '@/router/routes'
 // 创建小仓库
@@ -49,6 +49,13 @@ let useUserStore = defineStore('User', {
         this.avatar = result.data.checkUser.avatar
       } else {
       }
+    },
+    // 用户退出登录
+    userLogout() {
+      this.token = ''
+      this.username = ''
+      this.avatar = ''
+      REMOVE_TOKEN()
     },
   },
   getters: {},
