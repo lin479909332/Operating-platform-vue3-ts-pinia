@@ -40,6 +40,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { reqHasTrademark } from '@/api/product/trademark/index'
+import type { Records, TrademarkResponseData } from '@/api/product/trademark/type'
 // 当前页面
 let pageNo = ref<number>(1)
 // 每页展示多少条数据
@@ -47,10 +48,10 @@ let limit = ref<number>(3)
 // 存储已有品牌数据总数
 let total = ref<number>(0)
 // 存储已有品牌的数据
-let trademarkArr = ref<any>([])
+let trademarkArr = ref<Records>([])
 // 获取已有品牌的接口 这个接口需要多次调用，这里封装成函数
 const getHasTrademark = async () => {
-  let result = await reqHasTrademark(pageNo.value, limit.value)
+  let result: TrademarkResponseData = await reqHasTrademark(pageNo.value, limit.value)
   if (result.code === 200) {
     // 存储数据
     total.value = result.data.total

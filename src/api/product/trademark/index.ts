@@ -1,5 +1,6 @@
 // 品牌管理模块接口
 import request from '@/utils/request'
+import { TrademarkResponseData } from './type'
 
 // 品牌管理模块接口地址
 enum API {
@@ -10,4 +11,4 @@ enum API {
 //page:获取第几页 ---默认第1页
 //limit:获取几个已有品牌的数据
 export const reqHasTrademark = (page: number, limit: number) =>
-  request.get<any, any>(API.TRADEMARK_URL + `${page}/${limit}`)
+  request.get<any, TrademarkResponseData>(API.TRADEMARK_URL + `${page}/${limit}`)
