@@ -6,6 +6,8 @@ let useLayoutSettingStore = defineStore('SettingStore', {
     return {
       // 用户控制菜单折叠还是收起
       fold: false,
+      // 用户控制菜单栏是否刷新
+      refresh: false
     }
   },
 })

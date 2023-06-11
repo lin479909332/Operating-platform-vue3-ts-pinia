@@ -1,5 +1,10 @@
 <template>
-  <el-button circle size="small" icon="Refresh"></el-button>
+  <el-button
+    circle
+    size="small"
+    icon="Refresh"
+    @click="updateRefresh"
+  ></el-button>
   <el-button circle size="small" icon="FullScreen"></el-button>
   <el-button circle size="small" icon="Setting"></el-button>
   <img
@@ -23,6 +28,12 @@
 
 <script lang="ts" setup>
 import {} from 'vue'
+import useLayoutSettingStore from '@/store/modules/setting'
+let layoutSettingStore = useLayoutSettingStore()
+// 用户点击刷新按钮后修改仓库里的值
+const updateRefresh = () => {
+  layoutSettingStore.refresh = !layoutSettingStore.refresh
+}
 </script>
 <script lang="ts">
 export default {
