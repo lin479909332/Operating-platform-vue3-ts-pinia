@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { reqHasTrademark } from '@/api/product/trademark/index'
 import type { Records, TrademarkResponseData } from '@/api/product/trademark/type'
 // 当前页面
@@ -49,8 +49,9 @@ let limit = ref<number>(3)
 let total = ref<number>(0)
 // 存储已有品牌的数据
 let trademarkArr = ref<Records>([])
-// 获取已有品牌的接口 这个接口需要多次调用，这里封装成函数
-const getHasTrademark = async () => {
+// 获取已有品牌的接口 这个接口需要多次调用，这里封装成函数(默认传参返回第一页的结果)
+const getHasTrademark = async (pager = 1) => {
+  pageNo.value = pager
   let result: TrademarkResponseData = await reqHasTrademark(pageNo.value, limit.value)
   if (result.code === 200) {
     // 存储数据
@@ -66,6 +67,23 @@ const getHasTrademark = async () => {
 // 组件加载完毕时调用获取品牌的接口
 onMounted(() => {
   getHasTrademark()
+})
+/* 使用事件监听 官方不推荐
+
+// 页码发生变化 可以用参数接收一个回传，回传结果是跳转的页码(官方不推荐这么搞改成监听了)
+// const changePageNo = () => {
+//   getHasTrademark()
+// }
+// 官方不推荐这么搞改成监听了
+// const sizeChange = () => {
+//   getHasTrademark()
+// }
+
+*/
+
+// pageNo 已被双向绑定所以这里监听 pageNo 变化发请求即可 limit 同理
+watch([pageNo, limit], () => {
+  getHasTrademark(pageNo.value)
 })
 </script>
 
