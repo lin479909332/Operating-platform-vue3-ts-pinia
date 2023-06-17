@@ -13,7 +13,12 @@
       </el-table-column>
       <el-table-column label="品牌操作">
         <template #="{ row }">
-          <el-button type="warning" size="small" icon="edit" @click="updateTrademark"></el-button>
+          <el-button
+            type="warning"
+            size="small"
+            icon="edit"
+            @click="updateTrademark(row)"
+          ></el-button>
           <el-button type="danger" size="small" icon="delete"></el-button>
         </template>
       </el-table-column>
@@ -36,7 +41,11 @@
     />
   </el-card>
   <!-- 对话框组件 添加/修改品牌 -->
-  <el-dialog v-model="dialogFormVisible" title="添加品牌" @close="dialogClose">
+  <el-dialog
+    v-model="dialogFormVisible"
+    :title="trademarkParams.id ? '修改品牌' : '添加品牌'"
+    @close="dialogClose"
+  >
     <el-form style="width: 80%">
       <el-form-item label="品牌名称" label-width="80px">
         <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
@@ -135,9 +144,15 @@ const addTrademark = () => {
 }
 
 // 修改品牌
-const updateTrademark = () => {
+const updateTrademark = (row: Trademark) => {
   // 显示对话框
   dialogFormVisible.value = true
+  // 展示已有品牌数据（附加上id）
+  // trademarkParams.id = row.id
+  // trademarkParams.tmName = row.tmName
+  // trademarkParams.logoUrl = row.logoUrl
+  // ES6合并语法对象 与上面的等价
+  Object.assign(trademarkParams, row)
 }
 
 // 点击对话框的取消按钮
@@ -148,19 +163,19 @@ const cancel = () => {
 
 // 点击对话框的确定按钮
 const confirm = async () => {
-  // 发请求
+  // 添加/修改品牌
   let result: any = await reqAddOrUpdateTrademark(trademarkParams)
   if (result.code == 200) {
     ElMessage({
       type: 'success',
-      message: '上传图片成功',
+      message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功',
     })
     // 上传成功后重新刷新数据
-    getHasTrademark()
+    getHasTrademark(trademarkParams.id ? pageNo.value : 1)
   } else {
     ElMessage({
       type: 'error',
-      message: '上传图片失败',
+      message: trademarkParams.id ? '修改品牌失败' : '添加品牌失败',
     })
   }
   // 隐藏对话框
@@ -201,6 +216,7 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (response, _uploadFile) =>
 // 对话框关闭
 const dialogClose = () => {
   // 关闭时清空数据
+  trademarkParams.id = undefined
   trademarkParams.tmName = ''
   trademarkParams.logoUrl = ''
 }
