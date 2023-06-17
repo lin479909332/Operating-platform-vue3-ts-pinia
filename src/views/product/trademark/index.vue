@@ -19,7 +19,17 @@
             icon="edit"
             @click="updateTrademark(row)"
           ></el-button>
-          <el-button type="danger" size="small" icon="delete"></el-button>
+          <el-popconfirm
+            :title="`您确定要删除${row.tmName}吗？`"
+            width="250px"
+            icon="Delete"
+            icon-color="#FF0000"
+            @confirm="removeTradeMark(row.id)"
+          >
+            <template #reference>
+              <el-button type="danger" size="small" icon="delete"></el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -73,7 +83,11 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, reactive } from 'vue'
-import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
+import {
+  reqHasTrademark,
+  reqAddOrUpdateTrademark,
+  reqDeleteTrademark,
+} from '@/api/product/trademark/index'
 import type { Records, TrademarkResponseData, Trademark } from '@/api/product/trademark/type'
 import { ElMessage, UploadProps } from 'element-plus'
 
@@ -254,6 +268,23 @@ const validateLogoUrl = (_rule: any, value: any, callBack: any) => {
 const rules = {
   tmName: [{ required: true, trigger: 'blur', validator: validateTmName }],
   logoUrl: [{ required: true, validator: validateLogoUrl }],
+}
+
+// 删除品牌
+const removeTradeMark = async (id: number) => {
+  let result = await reqDeleteTrademark(id)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除品牌成功',
+    })
+    getHasTrademark(trademarkArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除品牌失败',
+    })
+  }
 }
 </script>
 
