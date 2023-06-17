@@ -39,17 +39,18 @@
   <el-dialog v-model="dialogFormVisible" title="添加品牌">
     <el-form style="width: 80%">
       <el-form-item label="品牌名称" label-width="80px">
-        <el-input placeholder="请输入品牌名称"></el-input>
+        <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
       </el-form-item>
       <el-form-item label="品牌LOGO" label-width="80px">
+        <!-- upload组件属性:action图片上传路径书写/api,代理服务器不发送这次post请求 -->
         <el-upload
           class="avatar-uploader"
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          action="/api/admin/product/fileUpload"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
         >
-          <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+          <img v-if="trademarkParams.logoUrl" :src="trademarkParams.logoUrl" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         </el-upload>
       </el-form-item>
@@ -62,19 +63,32 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, reactive } from 'vue'
 import { reqHasTrademark } from '@/api/product/trademark/index'
-import type { Records, TrademarkResponseData } from '@/api/product/trademark/type'
+import type { Records, TrademarkResponseData, Trademark } from '@/api/product/trademark/type'
+import { ElMessage, UploadProps } from 'element-plus'
+
 // 当前页面
 let pageNo = ref<number>(1)
+
 // 每页展示多少条数据
 let limit = ref<number>(3)
+
 // 存储已有品牌数据总数
 let total = ref<number>(0)
+
 // 存储已有品牌的数据
 let trademarkArr = ref<Records>([])
+
 // 控制对话框的显示与隐藏
 let dialogFormVisible = ref<boolean>(false)
+
+// 收集新增品牌的数据
+let trademarkParams = reactive<Trademark>({
+  tmName: '',
+  logoUrl: '',
+})
+
 // 获取已有品牌的接口 这个接口需要多次调用，这里封装成函数(默认传参返回第一页的结果)
 const getHasTrademark = async (pager = 1) => {
   pageNo.value = pager
@@ -90,10 +104,12 @@ const getHasTrademark = async (pager = 1) => {
     }
   }
 }
+
 // 组件加载完毕时调用获取品牌的接口
 onMounted(() => {
   getHasTrademark()
 })
+
 /* 使用事件监听 官方不推荐
 
 // 页码发生变化 可以用参数接收一个回传，回传结果是跳转的页码(官方不推荐这么搞改成监听了)
@@ -134,6 +150,37 @@ const cancel = () => {
 const confirm = () => {
   // 隐藏对话框
   dialogFormVisible.value = false
+}
+
+// 图片上传之前的钩子
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (
+    rawFile.type === 'image/png' ||
+    rawFile.type === 'image/jpeg' ||
+    rawFile.type === 'image/gif'
+  ) {
+    if (rawFile.size / 1024 / 1024 < 4) {
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '图片大小应小于4MB！',
+      })
+      return false
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '只支持png、jpg、jpeg、gif格式的图片！',
+    })
+    return false
+  }
+}
+
+// 图片上传成功后的钩子
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response, _uploadFile) => {
+  //response:即为当前这次上传图片post请求服务器返回的数据
+  //收集上传图片的地址,添加一个新的品牌的时候带给服务器
+  trademarkParams.logoUrl = response.data
 }
 </script>
 
