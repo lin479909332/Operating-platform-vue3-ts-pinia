@@ -36,7 +36,7 @@
     />
   </el-card>
   <!-- 对话框组件 添加/修改品牌 -->
-  <el-dialog v-model="dialogFormVisible" title="添加品牌">
+  <el-dialog v-model="dialogFormVisible" title="添加品牌" @close="dialogClose">
     <el-form style="width: 80%">
       <el-form-item label="品牌名称" label-width="80px">
         <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, reactive } from 'vue'
-import { reqHasTrademark } from '@/api/product/trademark/index'
+import { reqHasTrademark, reqAddOrUpdateTrademark } from '@/api/product/trademark/index'
 import type { Records, TrademarkResponseData, Trademark } from '@/api/product/trademark/type'
 import { ElMessage, UploadProps } from 'element-plus'
 
@@ -147,7 +147,22 @@ const cancel = () => {
 }
 
 // 点击对话框的确定按钮
-const confirm = () => {
+const confirm = async () => {
+  // 发请求
+  let result: any = await reqAddOrUpdateTrademark(trademarkParams)
+  if (result.code == 200) {
+    ElMessage({
+      type: 'success',
+      message: '上传图片成功',
+    })
+    // 上传成功后重新刷新数据
+    getHasTrademark()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '上传图片失败',
+    })
+  }
   // 隐藏对话框
   dialogFormVisible.value = false
 }
@@ -181,6 +196,13 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (response, _uploadFile) =>
   //response:即为当前这次上传图片post请求服务器返回的数据
   //收集上传图片的地址,添加一个新的品牌的时候带给服务器
   trademarkParams.logoUrl = response.data
+}
+
+// 对话框关闭
+const dialogClose = () => {
+  // 关闭时清空数据
+  trademarkParams.tmName = ''
+  trademarkParams.logoUrl = ''
 }
 </script>
 
