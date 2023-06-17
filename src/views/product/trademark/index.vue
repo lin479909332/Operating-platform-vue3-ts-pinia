@@ -46,11 +46,11 @@
     :title="trademarkParams.id ? '修改品牌' : '添加品牌'"
     @close="dialogClose"
   >
-    <el-form style="width: 80%">
-      <el-form-item label="品牌名称" label-width="80px">
+    <el-form style="width: 80%" :model="trademarkParams" :rules="rules" ref="formRef">
+      <el-form-item label="品牌名称" label-width="100px" prop="tmName">
         <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
       </el-form-item>
-      <el-form-item label="品牌LOGO" label-width="80px">
+      <el-form-item label="品牌LOGO" label-width="100px" prop="logoUrl">
         <!-- upload组件属性:action图片上传路径书写/api,代理服务器不发送这次post请求 -->
         <el-upload
           class="avatar-uploader"
@@ -91,6 +91,9 @@ let trademarkArr = ref<Records>([])
 
 // 控制对话框的显示与隐藏
 let dialogFormVisible = ref<boolean>(false)
+
+// 获取表单组件实例
+const formRef = ref()
 
 // 收集新增品牌的数据
 let trademarkParams = reactive<Trademark>({
@@ -163,6 +166,8 @@ const cancel = () => {
 
 // 点击对话框的确定按钮
 const confirm = async () => {
+  // 等待校验通过后再执行后面的代码
+  await formRef.value.validate()
   // 添加/修改品牌
   let result: any = await reqAddOrUpdateTrademark(trademarkParams)
   if (result.code == 200) {
@@ -211,6 +216,8 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (response, _uploadFile) =>
   //response:即为当前这次上传图片post请求服务器返回的数据
   //收集上传图片的地址,添加一个新的品牌的时候带给服务器
   trademarkParams.logoUrl = response.data
+  //图片上传成功,清除掉对应图片校验结果
+  formRef.value.clearValidate('logoUrl')
 }
 
 // 对话框关闭
@@ -219,6 +226,34 @@ const dialogClose = () => {
   trademarkParams.id = undefined
   trademarkParams.tmName = ''
   trademarkParams.logoUrl = ''
+  // formRef.value.clearValidate('tmName')
+  // formRef.value.clearValidate('logoUrl')
+  // 重置该表单项，将其值重置为初始值，并移除校验结果(和上面的等价)
+  formRef.value.resetFields()
+}
+
+// 针对品牌名的校验规则
+const validateTmName = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 2) {
+    callBack()
+  } else {
+    callBack(new Error('品牌名称长度不能小于2位'))
+  }
+}
+
+// 针对品牌图片的校验规则
+const validateLogoUrl = (_rule: any, value: any, callBack: any) => {
+  if (value) {
+    callBack()
+  } else {
+    callBack(new Error('品牌图片不能为空'))
+  }
+}
+
+// 表单校验规则
+const rules = {
+  tmName: [{ required: true, trigger: 'blur', validator: validateTmName }],
+  logoUrl: [{ required: true, validator: validateLogoUrl }],
 }
 </script>
 
