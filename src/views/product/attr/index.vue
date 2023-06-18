@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, ref } from 'vue'
+import { watch, ref, reactive } from 'vue'
 import { reqAttr } from '@/api/product/attr/index'
 import useCategoryStore from '@/store/modules/category'
 import { AttrResponseData, Attr } from '@/api/product/attr/type'
@@ -60,6 +60,18 @@ let attrArr = ref<Attr[]>([])
 
 //定义card组件内容切换变量 scene=0,显示table, scene=1,展示添加与修改属性结构
 let scene = ref<number>(0)
+
+// 收集新增的属性的数据
+let attrParams = reactive<Attr>({
+  // 新增属性的名字
+  attrName: '',
+  //新增属性值数组
+  attrValueList: [],
+  // 三级分类id
+  categoryId: '',
+  // 代表三级分类
+  categoryLevel: 3,
+})
 
 // 监听三级分类id
 watch(
