@@ -23,7 +23,12 @@
           </el-table-column>
           <el-table-column label="操作" width="150px">
             <template #="{ row }">
-              <el-button type="warning" size="small" icon="edit" @click="updateAttr"></el-button>
+              <el-button
+                type="warning"
+                size="small"
+                icon="edit"
+                @click="updateAttr(row)"
+              ></el-button>
               <el-button type="danger" size="small" icon="delete"></el-button>
             </template>
           </el-table-column>
@@ -158,9 +163,11 @@ const addAttrValue = () => {
 }
 
 // 编辑属性
-const updateAttr = () => {
+const updateAttr = (row: Attr) => {
   // 切换场景
   scene.value = 1
+  // 合并对象，用json转换两次实现深拷贝，浅拷贝会影响数据
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
 
 // 取消按钮
