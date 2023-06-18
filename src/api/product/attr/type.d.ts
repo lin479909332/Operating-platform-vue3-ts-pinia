@@ -27,7 +27,7 @@ export interface AttrValue {
   id?: number
   valueName: string
   attrId?: number
-  flag?:boolean
+  flag?: boolean
 }
 
 // 存储每一个属性值的数组类型
