@@ -48,17 +48,28 @@
           <el-table-column label="序号" width="100px" type="index" align="center"></el-table-column>
           <el-table-column label="属性值名称">
             <template #="{ row, $index }">
+              <!-- 组件实例发生变化的时候存储当前这个组件实例到inputArr里 -->
               <el-input
+                :ref="(vc:any)=>inputArr[$index]=vc"
                 v-if="row.flag"
                 @blur="toLook(row, $index)"
                 size="small"
                 v-model="row.valueName"
                 placeholder="请输入属性值"
               ></el-input>
-              <div v-else @click="toEdit(row)">{{ row.valueName }}</div>
+              <div v-else @click="toEdit(row, $index)">{{ row.valueName }}</div>
             </template>
           </el-table-column>
-          <el-table-column label="属性值操作"></el-table-column>
+          <el-table-column label="属性值操作">
+            <template #="{ row, $index }">
+              <el-button
+                type="danger"
+                icon="delete"
+                size="small"
+                @click="attrParams.attrValueList.splice($index, 1)"
+              ></el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <el-button @click="save" :disabled="!attrParams.attrValueList.length" type="primary">
           保存
@@ -70,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, ref, reactive } from 'vue'
+import { watch, ref, reactive, nextTick } from 'vue'
 import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr/index'
 import useCategoryStore from '@/store/modules/category'
 import { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
@@ -81,6 +92,9 @@ let attrArr = ref<Attr[]>([])
 
 // 定义card组件内容切换变量 scene=0,显示table, scene=1,展示添加与修改属性结构
 let scene = ref<number>(0)
+
+// 存储el-input的组件实例
+let inputArr = ref<any>([])
 
 // 收集新增的属性的数据
 let attrParams = reactive<Attr>({
@@ -136,6 +150,10 @@ const addAttrValue = () => {
     valueName: '',
     // true编辑模式 false查看模式
     flag: true,
+  })
+  nextTick(() => {
+    // 点击后聚焦
+    inputArr.value[attrParams.attrValueList.length - 1].focus()
   })
 }
 
@@ -205,8 +223,12 @@ const toLook = (row: AttrValue, $index: number) => {
 }
 
 // 点击div框，切换为编辑模式
-const toEdit = (row: AttrValue) => {
+const toEdit = (row: AttrValue, $index: number) => {
   row.flag = true
+  nextTick(() => {
+    // 点击后聚焦
+    inputArr.value[$index].focus()
+  })
 }
 </script>
 
