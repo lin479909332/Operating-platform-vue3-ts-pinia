@@ -47,13 +47,22 @@
         <el-table :data="attrParams.attrValueList" border style="margin: 10px 0">
           <el-table-column label="序号" width="100px" type="index" align="center"></el-table-column>
           <el-table-column label="属性值名称">
-            <template #="{ row }">
-              <el-input v-model="row.valueName" placeholder="请输入属性值"></el-input>
+            <template #="{ row, $index }">
+              <el-input
+                v-if="row.flag"
+                @blur="toLook(row, $index)"
+                size="small"
+                v-model="row.valueName"
+                placeholder="请输入属性值"
+              ></el-input>
+              <div v-else @click="toEdit(row)">{{ row.valueName }}</div>
             </template>
           </el-table-column>
           <el-table-column label="属性值操作"></el-table-column>
         </el-table>
-        <el-button @click="save" type="primary">保存</el-button>
+        <el-button @click="save" :disabled="!attrParams.attrValueList.length" type="primary">
+          保存
+        </el-button>
         <el-button @click="cancel">取消</el-button>
       </div>
     </el-card>
@@ -64,13 +73,13 @@
 import { watch, ref, reactive } from 'vue'
 import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr/index'
 import useCategoryStore from '@/store/modules/category'
-import { AttrResponseData, Attr } from '@/api/product/attr/type'
+import { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus'
 let categoryStore = useCategoryStore()
 // 存储已有属性与属性值
 let attrArr = ref<Attr[]>([])
 
-//定义card组件内容切换变量 scene=0,显示table, scene=1,展示添加与修改属性结构
+// 定义card组件内容切换变量 scene=0,显示table, scene=1,展示添加与修改属性结构
 let scene = ref<number>(0)
 
 // 收集新增的属性的数据
@@ -125,6 +134,8 @@ const addAttr = () => {
 const addAttrValue = () => {
   attrParams.attrValueList.push({
     valueName: '',
+    // true编辑模式 false查看模式
+    flag: true,
   })
 }
 
@@ -159,6 +170,43 @@ const save = async () => {
       message: attrParams.id ? '修改失败' : '添加失败',
     })
   }
+}
+
+// input失焦事件，切换为查看模式
+const toLook = (row: AttrValue, $index: number) => {
+  // 非法情况1 用户输入空串
+  if (row.valueName.trim() === '') {
+    // 清空掉空白对象
+    attrParams.attrValueList.splice($index, 1)
+    ElMessage({
+      type: 'error',
+      message: '属性值名称不能为空',
+    })
+    return
+  }
+  // 非法情况2 用户输入的重复的属性值名称
+  let repeat = attrParams.attrValueList.find((item) => {
+    // 切记排除掉自身后再进行判断
+    if (item != row) {
+      return item.valueName === row.valueName
+    }
+  })
+  // 出现了属性值重复
+  if (repeat) {
+    // 清空掉重复属性值的哪个对象
+    attrParams.attrValueList.splice($index, 1)
+    ElMessage({
+      type: 'error',
+      message: '属性值名称不能重复',
+    })
+    return
+  }
+  row.flag = false
+}
+
+// 点击div框，切换为编辑模式
+const toEdit = (row: AttrValue) => {
+  row.flag = true
 }
 </script>
 
