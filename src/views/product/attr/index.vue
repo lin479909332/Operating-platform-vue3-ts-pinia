@@ -29,7 +29,11 @@
                 icon="edit"
                 @click="updateAttr(row)"
               ></el-button>
-              <el-button type="danger" size="small" icon="delete"></el-button>
+              <el-popconfirm :title="`是否要删除${row.attrName}`" @confirm="removeAttr(row.id)">
+                <template #reference>
+                  <el-button type="danger" size="small" icon="delete"></el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -87,7 +91,7 @@
 
 <script lang="ts" setup>
 import { watch, ref, reactive, nextTick } from 'vue'
-import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr/index'
+import { reqAttr, reqAddOrUpdateAttr, reqRemoveAttr } from '@/api/product/attr/index'
 import useCategoryStore from '@/store/modules/category'
 import { AttrResponseData, Attr, AttrValue } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus'
@@ -236,6 +240,24 @@ const toEdit = (row: AttrValue, $index: number) => {
     // 点击后聚焦
     inputArr.value[$index].focus()
   })
+}
+
+// 删除已有属性
+const removeAttr = async (attrId: number) => {
+  let result = await reqRemoveAttr(attrId)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除属性成功',
+    })
+    // 重新获取一次数据
+    getAttr()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除属性失败',
+    })
+  }
 }
 </script>
 

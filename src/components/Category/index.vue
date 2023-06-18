@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 // 引入分类相关仓库
 import useCategoryStore from '@/store/modules/category'
 let categoryStore = useCategoryStore()
@@ -87,6 +87,12 @@ const c2Handler = () => {
 
 // 此方法即为三级分类下拉菜单的change事件(选中值的时候会触发,保证三级分类ID有了)
 const c3Handler = () => {}
+
+// 组件销毁的时候清空仓库里的数据
+onBeforeUnmount(() => {
+  // 用这个方法可以一次性清空
+  categoryStore.$reset()
+})
 </script>
 
 <style lang="scss" scoped></style>
