@@ -32,17 +32,28 @@
       <div v-show="scene === 1">
         <el-form :inline="true">
           <el-form-item label="属性名称">
-            <el-input placeholder="请输入属性名称"></el-input>
+            <el-input v-model="attrParams.attrName" placeholder="请输入属性名称"></el-input>
           </el-form-item>
         </el-form>
-        <el-button type="primary" icon="plus">添加属性值</el-button>
+        <el-button
+          @click="addAttrValue"
+          :disabled="!attrParams.attrName"
+          type="primary"
+          icon="plus"
+        >
+          添加属性值
+        </el-button>
         <el-button @click="cancel">取消</el-button>
-        <el-table border style="margin: 10px 0">
+        <el-table :data="attrParams.attrValueList" border style="margin: 10px 0">
           <el-table-column label="序号" width="100px" type="index" align="center"></el-table-column>
-          <el-table-column label="属性值名称"></el-table-column>
+          <el-table-column label="属性值名称">
+            <template #="{ row }">
+              <el-input v-model="row.valueName" placeholder="请输入属性值"></el-input>
+            </template>
+          </el-table-column>
           <el-table-column label="属性值操作"></el-table-column>
         </el-table>
-        <el-button type="primary">保存</el-button>
+        <el-button @click="save" type="primary">保存</el-button>
         <el-button @click="cancel">取消</el-button>
       </div>
     </el-card>
@@ -51,9 +62,10 @@
 
 <script lang="ts" setup>
 import { watch, ref, reactive } from 'vue'
-import { reqAttr } from '@/api/product/attr/index'
+import { reqAttr, reqAddOrUpdateAttr } from '@/api/product/attr/index'
 import useCategoryStore from '@/store/modules/category'
 import { AttrResponseData, Attr } from '@/api/product/attr/type'
+import { ElMessage } from 'element-plus'
 let categoryStore = useCategoryStore()
 // 存储已有属性与属性值
 let attrArr = ref<Attr[]>([])
@@ -96,8 +108,24 @@ const getAttr = async () => {
 
 // 添加属性
 const addAttr = () => {
+  // 清空上一次的属性值
+  Object.assign(attrParams, {
+    attrName: '',
+    attrValueList: [],
+    // 在这里顺便收集三级分类的id
+    categoryId: categoryStore.c3Id,
+    // 代表三级分类
+    categoryLevel: 3,
+  })
   // 切换场景
   scene.value = 1
+}
+
+// 添加属性值
+const addAttrValue = () => {
+  attrParams.attrValueList.push({
+    valueName: '',
+  })
 }
 
 // 编辑属性
@@ -110,6 +138,27 @@ const updateAttr = () => {
 const cancel = () => {
   // 切换场景
   scene.value = 0
+}
+
+// 保存按钮
+const save = async () => {
+  let result: any = await reqAddOrUpdateAttr(attrParams)
+  if (result.code === 200) {
+    // 切换场景
+    scene.value = 0
+    // 提示信息
+    ElMessage({
+      type: 'success',
+      message: attrParams.id ? '修改成功' : '添加成功',
+    })
+    // 重新获取属性值
+    getAttr()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: attrParams.id ? '修改失败' : '添加失败',
+    })
+  }
 }
 </script>
 
