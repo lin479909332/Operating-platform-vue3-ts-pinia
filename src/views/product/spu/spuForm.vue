@@ -1,17 +1,24 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
-      <el-input placeholder="请输入SPU名称"></el-input>
+      <el-input placeholder="请输入SPU名称" v-model="SpuParams.spuName"></el-input>
     </el-form-item>
     <el-form-item label="SPU品牌">
-      <el-select placeholder="请选择SPU品牌">
-        <el-option label="nikke"></el-option>
-        <el-option label="公主连结"></el-option>
-        <el-option label="碧蓝航线"></el-option>
+      <el-select placeholder="请选择SPU品牌" v-model="SpuParams.tmId">
+        <el-option
+          v-for="item in allTradeMark"
+          :key="item.id"
+          :label="item.tmName"
+          :value="item.id"
+        ></el-option>
       </el-select>
     </el-form-item>
     <el-form-item label="SPU描述">
-      <el-input type="textarea" placeholder="请输入SPU描述"></el-input>
+      <el-input
+        type="textarea"
+        placeholder="请输入SPU描述"
+        v-model="SpuParams.description"
+      ></el-input>
     </el-form-item>
     <el-form-item label="SPU图标">
       <el-upload
@@ -51,7 +58,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import type { SpuData } from '@/api/product/spu/type'
 import {
   reqAllTradeMark,
   reqSpuImageList,
@@ -62,6 +68,7 @@ import type {
   TradeMark,
   SpuImg,
   SaleAttr,
+  SpuData,
   AllSaleAttr,
   AllTradeMark,
   SpuHasImg,
@@ -83,9 +90,23 @@ let imgList = ref<SpuImg[]>([])
 let saleAttr = ref<SaleAttr[]>([])
 // 全部销售属性
 let allSaleAttr = ref<AllSaleAttr[]>([])
-
+//存储已有的SPU对象
+let SpuParams = ref<SpuData>({
+  //收集三级分类的ID
+  category3Id: '',
+  //SPU的名字
+  spuName: '',
+  //SPU的描述
+  description: '',
+  //品牌的ID
+  tmId: '',
+  spuImageList: [],
+  spuSaleAttrList: [],
+})
 const initHasSpuData = async (spu: SpuData) => {
-  // spu:即为父组件传递过来的已有的SPU对象[不完整]
+  // 形参spu:即为父组件传递过来的已有的SPU对象[不完整]
+  //存储已有的SPU对象,将来在模板中展示
+  SpuParams.value = spu
   // 获取全部品牌的数据
   let result: AllTradeMark = await reqAllTradeMark()
   // 获取某一个品牌旗下全部售卖商品的图片
