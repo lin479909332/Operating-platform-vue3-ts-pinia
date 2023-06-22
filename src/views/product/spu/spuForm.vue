@@ -43,11 +43,38 @@
         <el-option label="碧蓝航线"></el-option>
       </el-select>
       <el-button style="margin-left: 10px" type="primary" icon="plus">添加销售属性</el-button>
-      <el-table border style="margin: 10px 0">
+      <el-table border style="margin: 10px 0" :data="saleAttr">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
-        <el-table-column label="销售属性名" width="140px"></el-table-column>
-        <el-table-column label="销售属性值"></el-table-column>
-        <el-table-column label="操作" width="140px"></el-table-column>
+        <el-table-column
+          label="销售属性名"
+          align="center"
+          width="140px"
+          prop="saleAttrName"
+        ></el-table-column>
+        <el-table-column label="销售属性值">
+          <template #="{ row }">
+            <el-tag
+              v-for="item in row.spuSaleAttrValueList"
+              :key="item.id"
+              class="mx-1"
+              closable
+              style="margin: 0 5px"
+            >
+              {{ item.saleAttrValueName }}
+            </el-tag>
+            <el-button type="success" icon="plus" size="small"></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="140px">
+          <template #="{ row, $index }">
+            <el-button
+              type="danger"
+              icon="delete"
+              size="small"
+              @click="saleAttr.splice($index, 1)"
+            ></el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-form-item>
     <el-form-item>
