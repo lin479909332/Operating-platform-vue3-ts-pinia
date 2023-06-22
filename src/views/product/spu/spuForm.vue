@@ -69,15 +69,30 @@
         <el-table-column label="销售属性值">
           <template #="{ row }">
             <el-tag
-              v-for="item in row.spuSaleAttrValueList"
+              v-for="(item, index) in row.spuSaleAttrValueList"
               :key="item.id"
               class="mx-1"
               closable
               style="margin: 0 5px"
+              @close="row.spuSaleAttrValueList.splice(index, 1)"
             >
               {{ item.saleAttrValueName }}
             </el-tag>
-            <el-button type="success" icon="plus" size="small"></el-button>
+            <el-input
+              v-show="row.flag"
+              placeholder="请输入销售属性值"
+              style="width: 130px"
+              size="small"
+              @blur="toLook(row)"
+              v-model="row.saleAttrValue"
+            ></el-input>
+            <el-button
+              v-show="!row.flag"
+              @click="toEdit(row)"
+              type="success"
+              icon="plus"
+              size="small"
+            ></el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="140px">
@@ -112,6 +127,7 @@ import type {
   SpuImg,
   SaleAttr,
   SpuData,
+  SaleAttrValue,
   AllSaleAttr,
   AllTradeMark,
   SpuHasImg,
@@ -249,6 +265,46 @@ const addSaleAttr = () => {
   saleAttr.value.push(newSaleAttr)
   // 清空收集的数据
   saleAttrIdAndValueName.value = ''
+}
+
+// 切换为编辑模式（新增销售属性值）
+const toEdit = (row: SaleAttr) => {
+  row.flag = true
+  row.saleAttrValue = ''
+}
+
+// 切换为查看模式（新增销售属性值）
+const toLook = (row: SaleAttr) => {
+  // 整理收集的属性的ID与属性值的名字
+  let { baseSaleAttrId, saleAttrValue } = row
+  // 整理成服务器需要的属性值形式
+  let newSaleAttrValue: SaleAttrValue = {
+    baseSaleAttrId,
+    saleAttrValueName: saleAttrValue as string,
+  }
+  // 非法情况1 空白值
+  if (saleAttrValue?.trim() === '') {
+    ElMessage({
+      type: 'error',
+      message: '销售属性值不能为空',
+    })
+    return
+  }
+  // 非法情况2 重复值
+  let repeat = row.spuSaleAttrValueList.find((item) => {
+    return item.saleAttrValueName == saleAttrValue
+  })
+  if (repeat) {
+    ElMessage({
+      type: 'error',
+      message: '销售属性值不能重复',
+    })
+    return
+  }
+  // 追加新的属性值对象
+  row.spuSaleAttrValueList.push(newSaleAttrValue)
+  // 切换为查看模式
+  row.flag = false
 }
 
 // 对外暴露
