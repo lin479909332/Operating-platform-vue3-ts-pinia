@@ -47,7 +47,7 @@ import { HasSpuResponseData, Records } from '@/api/product/spu/type'
 import SpuForm from './SpuForm.vue'
 import SkuForm from './skuForm.vue'
 import useCategoryStore from '@/store/modules/category'
-import type {SpuData} from '@/api/product/spu/type'
+import type { SpuData } from '@/api/product/spu/type'
 let categoryStore = useCategoryStore()
 
 // 控制场景的可用状态，0:显示已有SPU 1:添加或者修改已有SPU 2:添加SKu的结构
@@ -102,7 +102,7 @@ const addSpu = () => {
 }
 
 // 修改spu按钮
-const updateSpu = (row:SpuData) => {
+const updateSpu = (row: SpuData) => {
   // 切换为场景1:添加与修改已有SPU结构->SpuForm
   scene.value = 1
   // 调用子组件实例方法获取完整已有的SPU的数据
