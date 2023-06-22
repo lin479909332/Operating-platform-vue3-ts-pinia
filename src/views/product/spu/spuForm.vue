@@ -31,18 +31,33 @@
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
-
       <el-dialog v-model="dialogVisible">
         <img w-full :src="dialogImageUrl" alt="Preview Image" style="width: 50%; height: 50%" />
       </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
-      <el-select placeholder="请选择SPU销售属性">
-        <el-option label="nikke"></el-option>
-        <el-option label="公主连结"></el-option>
-        <el-option label="碧蓝航线"></el-option>
+      <!-- 展示销售属性的下拉菜单 -->
+      <el-select
+        v-model="saleAttrIdAndValueName"
+        :placeholder="unSelectSaleAttr.length ? `还有${unSelectSaleAttr.length}个未选择` : '无'"
+      >
+        <el-option
+          v-for="item in unSelectSaleAttr"
+          :key="item.id"
+          :label="item.name"
+          :value="`${item.id}:${item.name}`"
+        ></el-option>
       </el-select>
-      <el-button style="margin-left: 10px" type="primary" icon="plus">添加销售属性</el-button>
+      <el-button
+        :disabled="!saleAttrIdAndValueName"
+        style="margin-left: 10px"
+        type="primary"
+        icon="plus"
+        @click="addSaleAttr"
+      >
+        添加销售属性
+      </el-button>
+      <!-- table展示销售属性与属性值的地方 -->
       <el-table border style="margin: 10px 0" :data="saleAttr">
         <el-table-column label="序号" type="index" align="center" width="100px"></el-table-column>
         <el-table-column
@@ -85,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   reqAllTradeMark,
   reqSpuImageList,
@@ -104,7 +119,6 @@ import type {
   AllSaleAttrResponseData,
 } from '@/api/product/spu/type'
 import { ElMessage } from 'element-plus'
-import { fa } from 'element-plus/es/locale'
 let $emit = defineEmits(['changeScene'])
 
 // 取消按钮
@@ -137,6 +151,9 @@ let SpuParams = ref<SpuData>({
   spuImageList: [],
   spuSaleAttrList: [],
 })
+
+// 将来收集还未选择的销售属性的ID与属性值的名字
+const saleAttrIdAndValueName = ref<string>('')
 
 const initHasSpuData = async (spu: SpuData) => {
   // 形参spu:即为父组件传递过来的已有的SPU对象[不完整]
@@ -203,6 +220,35 @@ const beforeUpload = (file: any) => {
     })
     return false
   }
+}
+
+// 计算出还未拥有的销售属性
+const unSelectSaleAttr = computed(() => {
+  let unSelectArr = allSaleAttr.value.filter((item) => {
+    return saleAttr.value.every((item1) => {
+      return item.name != item1.saleAttrName
+    })
+  })
+  return unSelectArr
+})
+
+// 新增销售属性值
+const addSaleAttr = () => {
+  /*
+  baseSaleAttrId: number | string
+  saleAttrValueName: string
+  spuSaleAttrValueList: spuSaleAttrValueList
+  */
+  const [baseSaleAttrId, saleAttrName] = saleAttrIdAndValueName.value.split(':')
+  let newSaleAttr: SaleAttr = {
+    baseSaleAttrId,
+    saleAttrName,
+    spuSaleAttrValueList: [],
+  }
+  // 添加到数组中
+  saleAttr.value.push(newSaleAttr)
+  // 清空收集的数据
+  saleAttrIdAndValueName.value = ''
 }
 
 // 对外暴露
