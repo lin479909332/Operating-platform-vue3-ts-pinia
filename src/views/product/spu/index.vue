@@ -113,6 +113,8 @@ const updateSpu = (row: SpuData) => {
 const changeScene = (num: number) => {
   // 子组件Spuform点击取消变为场景0:展示已有的SPU
   scene.value = num
+  // 重新获取一遍spu
+  getHasSpu()
 }
 </script>
 
