@@ -22,17 +22,18 @@
     </el-form-item>
     <el-form-item label="SPU图标">
       <el-upload
-        v-model:file-list="fileList"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        v-model:file-list="imgList"
+        action="/api/admin/product/fileUpload"
         list-type="picture-card"
         :on-preview="handlePictureCardPreview"
         :on-remove="handleRemove"
+        :before-upload="beforeUpload"
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
 
       <el-dialog v-model="dialogVisible">
-        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        <img w-full :src="dialogImageUrl" alt="Preview Image" style="width: 50%; height: 50%" />
       </el-dialog>
     </el-form-item>
     <el-form-item label="SPU销售属性">
@@ -75,6 +76,8 @@ import type {
   SaleAttrResponseData,
   AllSaleAttrResponseData,
 } from '@/api/product/spu/type'
+import { ElMessage } from 'element-plus'
+import { fa } from 'element-plus/es/locale'
 let $emit = defineEmits(['changeScene'])
 
 // 取消按钮
@@ -84,12 +87,16 @@ const cancel = () => {
 
 // 存储已有的spu数据
 let allTradeMark = ref<TradeMark[]>([])
+
 // 商品图片
 let imgList = ref<SpuImg[]>([])
+
 // 已有的SPU销售属性
 let saleAttr = ref<SaleAttr[]>([])
+
 // 全部销售属性
 let allSaleAttr = ref<AllSaleAttr[]>([])
+
 //存储已有的SPU对象
 let SpuParams = ref<SpuData>({
   //收集三级分类的ID
@@ -103,6 +110,7 @@ let SpuParams = ref<SpuData>({
   spuImageList: [],
   spuSaleAttrList: [],
 })
+
 const initHasSpuData = async (spu: SpuData) => {
   // 形参spu:即为父组件传递过来的已有的SPU对象[不完整]
   //存储已有的SPU对象,将来在模板中展示
@@ -118,11 +126,56 @@ const initHasSpuData = async (spu: SpuData) => {
   // 存储全部品牌数据
   allTradeMark.value = result.data
   // SPU对应商品图片
-  imgList.value = result1.data
+  imgList.value = result1.data.map((item) => {
+    return {
+      name: item.imgName,
+      url: item.imgUrl,
+    }
+  })
   // 已有的SPU销售属性
   saleAttr.value = result2.data
   // 全部销售属性
   allSaleAttr.value = result3.data
+}
+
+// 控制dialog的显示与隐藏
+let dialogVisible = ref<boolean>(false)
+
+// dialog里的图片地址
+let dialogImageUrl = ref<string>('')
+
+// 照片墙点击预览的钩子
+const handlePictureCardPreview = (file: any) => {
+  // 给dialog里的图片赋值
+  dialogImageUrl.value = file.url
+  // 显示dialog
+  dialogVisible.value = true
+}
+
+// 照片墙删除文件的钩子
+const handleRemove = () => {
+  console.log('删除了照片墙的文件')
+}
+
+// 照片墙上传文件之前的钩子
+const beforeUpload = (file: any) => {
+  if (file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/jpeg') {
+    if (file.size / 1024 / 1024 < 3) {
+      return true
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '图片不能大于3MB',
+      })
+      return false
+    }
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '只允许上传png|gif|jpeg格式的图片',
+    })
+    return false
+  }
 }
 
 // 对外暴露

@@ -53,10 +53,12 @@ export interface AllTradeMark extends ResponseData {
 
 // 商品图片的ts类型
 export interface SpuImg {
-  id: number
-  spuId: number
-  imgName: string
-  imgUrl: string
+  id?: number
+  spuId?: number
+  imgName?: string
+  imgUrl?: string
+  name?: string
+  url?: string
 }
 
 // 已有的SPU的照片墙数据的类型
