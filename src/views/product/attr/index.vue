@@ -140,6 +140,8 @@ const getAttr = async () => {
 
 // 添加属性
 const addAttr = () => {
+  // 清空之前的id,防止先修改后再添加出现id残留的情况，继而判断为修改
+  attrParams.id = undefined
   // 清空上一次的属性值
   Object.assign(attrParams, {
     attrName: '',
