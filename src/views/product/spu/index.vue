@@ -133,7 +133,7 @@ const changeScene = (obj: any) => {
 }
 
 // 添加sku按钮
-const addSku = (row: any) => {
+const addSku = (row: SpuData) => {
   // 切换场景为2
   scene.value = 2
   sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)

@@ -1,16 +1,16 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="sku名称">
-      <el-input placeholder="请输入sku名称"></el-input>
+      <el-input placeholder="请输入sku名称" v-model="skuParams.skuName"></el-input>
     </el-form-item>
     <el-form-item label="价格（元）">
-      <el-input placeholder="请输入价格" type="number"></el-input>
+      <el-input placeholder="请输入价格" type="number" v-model="skuParams.price"></el-input>
     </el-form-item>
     <el-form-item label="重量（克）">
-      <el-input placeholder="请输入重量"></el-input>
+      <el-input placeholder="请输入重量" v-model="skuParams.weight"></el-input>
     </el-form-item>
     <el-form-item label="sku描述">
-      <el-input placeholder="请输入sku描述" type="textarea"></el-input>
+      <el-input placeholder="请输入sku描述" type="textarea" v-model="skuParams.skuDesc"></el-input>
     </el-form-item>
     <el-form-item label="平台属性">
       <el-row>
@@ -67,14 +67,16 @@
 import { reqAttr } from '@/api/product/attr'
 import { AttrResponseData, Attr } from '@/api/product/attr/type'
 import { reqSpuImageList, reqSpuHasSaleAttr } from '@/api/product/spu'
+import type { SpuData } from '@/api/product/spu/type'
 import type {
   CategoryId,
   SpuHasImg,
   SaleAttrResponseData,
   SpuImg,
   SaleAttr,
+  SkuData,
 } from '@/api/product/spu/type'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 // 父组件的自定义事件
 let $emit = defineEmits(['changeScene'])
 
@@ -87,12 +89,40 @@ let imgArr = ref<SpuImg[]>([])
 // 已有的SPU销售属性
 let saleArr = ref<SaleAttr[]>([])
 
+// 新增sku需要收集的参数
+let skuParams = reactive<SkuData>({
+  //三级分类的ID
+  category3Id: '',
+  //已有的SPU的ID
+  spuId: '',
+  //SPU品牌的ID
+  tmId: '',
+  //sku名字
+  skuName: '',
+  //sku价格
+  price: '',
+  //sku重量
+  weight: '',
+  //sku的描述
+  skuDesc: '',
+  // 平台属性
+  skuAttrValueList: [],
+  // 销售属性
+  skuSaleAttrValueList: [],
+  //sku图片地址
+  skuDefaultImg: '',
+})
+
 // 初始化sku数据
-const initSkuData = async (c1Id: CategoryId, c2Id: CategoryId, spu: any) => {
+const initSkuData = async (c1Id: CategoryId, c2Id: CategoryId, spu: SpuData) => {
+  // 收集新增sku需要的参数
+  skuParams.category3Id = spu.category3Id
+  skuParams.spuId = spu.id as number
+  skuParams.tmId = spu.tmId
   // 发请求
   let result: AttrResponseData = await reqAttr(c1Id, c2Id, spu.category3Id)
-  let result1: SpuHasImg = await reqSpuImageList(spu.id)
-  let result2: SaleAttrResponseData = await reqSpuHasSaleAttr(spu.id)
+  let result1: SpuHasImg = await reqSpuImageList(spu.id as number)
+  let result2: SaleAttrResponseData = await reqSpuHasSaleAttr(spu.id as number)
   // 平台属性
   attrArr.value = result.data
   // 图片
