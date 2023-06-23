@@ -32,7 +32,15 @@
               title="查看SKU列表"
               @click="showSku(row)"
             ></el-button>
-            <el-button size="small" type="danger" icon="delete" title="删除SPU"></el-button>
+            <el-popconfirm
+              :title="`你确认要删除${row.spuName}吗？`"
+              width="200px"
+              @confirm="deleteSpu(row)"
+            >
+              <template #reference>
+                <el-button size="small" type="danger" icon="delete" title="删除SPU"></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -67,13 +75,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
-import { reqGetSpu, reqSkuList } from '@/api/product/spu'
+import { ref, watch, onBeforeUnmount } from 'vue'
+import { reqGetSpu, reqSkuList, reqRemoveSpu } from '@/api/product/spu'
 import { HasSpuResponseData, Records, SkuData, SkuInfoData } from '@/api/product/spu/type'
 import SpuForm from './SpuForm.vue'
 import SkuForm from './skuForm.vue'
 import useCategoryStore from '@/store/modules/category'
 import type { SpuData } from '@/api/product/spu/type'
+import { ElMessage } from 'element-plus'
 let categoryStore = useCategoryStore()
 
 // 控制场景的可用状态，0:显示已有SPU 1:添加或者修改已有SPU 2:添加SKu的结构
@@ -175,6 +184,29 @@ const showSku = async (row: SpuData) => {
     skuArr.value = result.data
   }
 }
+
+// 删除spu
+const deleteSpu = async (row: SpuData) => {
+  let result = await reqRemoveSpu(row.id as number)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除SPU成功',
+    })
+    // 删除后获取剩余的spu数据
+    getHasSpu(records.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '删除SPU失败',
+    })
+  }
+}
+
+// 路由组件销毁前，清空仓库关于分类的数据
+onBeforeUnmount(() => {
+  categoryStore.$reset()
+})
 </script>
 
 <style lang="less" scoped></style>
