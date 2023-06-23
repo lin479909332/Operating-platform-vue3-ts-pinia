@@ -109,17 +109,17 @@ export interface AllSaleAttrResponseData extends ResponseData {
 
 export interface Attr {
   //平台属性的ID
-  attrId: number | string 
+  attrId: number | string
   //属性值的ID
-  valueId: number | string 
+  valueId: number | string
   attrIdAndValueId?: string
 }
 
 export interface saleAttr {
   //属性ID
-  saleAttrId: number | string 
+  saleAttrId: number | string
   //属性值的ID
-  saleAttrValueId: number | string 
+  saleAttrValueId: number | string
 }
 
 export interface SkuData {
