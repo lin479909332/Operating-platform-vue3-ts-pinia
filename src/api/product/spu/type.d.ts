@@ -88,6 +88,7 @@ export interface SaleAttr {
   spuSaleAttrValueList: spuSaleAttrValueList
   flag?: boolean
   saleAttrValue?: string
+  saleIdAndValueId?: string
 }
 
 // SPU已有的销售属性接口返回数据ts类型
@@ -107,13 +108,18 @@ export interface AllSaleAttrResponseData extends ResponseData {
 }
 
 export interface Attr {
-  attrId: number | string //平台属性的ID
-  valueId: number | string //属性值的ID
+  //平台属性的ID
+  attrId: number | string 
+  //属性值的ID
+  valueId: number | string 
+  attrIdAndValueId?: string
 }
 
 export interface saleAttr {
-  saleAttrId: number | string //属性ID
-  saleAttrValueId: number | string //属性值的ID
+  //属性ID
+  saleAttrId: number | string 
+  //属性值的ID
+  saleAttrValueId: number | string 
 }
 
 export interface SkuData {
