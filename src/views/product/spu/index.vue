@@ -16,7 +16,7 @@
               type="primary"
               icon="plus"
               title="添加SKU"
-              @click="addSku"
+              @click="addSku(row)"
             ></el-button>
             <el-button
               @click="updateSpu(row)"
@@ -42,7 +42,7 @@
     <!-- 添加|修改Spu子组件 -->
     <SpuForm ref="spu" v-show="scene === 1" @changeScene="changeScene" />
     <!-- 添加Sku子组件 -->
-    <SkuForm v-show="scene === 2" @changeScene="changeScene" />
+    <SkuForm ref="sku" v-show="scene === 2" @changeScene="changeScene" />
   </el-card>
 </template>
 
@@ -73,6 +73,9 @@ let total = ref<number>(0)
 
 // spuForm组件实例
 let spu = ref<any>()
+
+// skuForm组件实例
+let sku = ref<any>()
 
 // 监听仓库的三级分类id发生变化
 watch(
@@ -130,9 +133,10 @@ const changeScene = (obj: any) => {
 }
 
 // 添加sku按钮
-const addSku = () => {
+const addSku = (row: any) => {
   // 切换场景为2
   scene.value = 2
+  sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
 }
 </script>
 
