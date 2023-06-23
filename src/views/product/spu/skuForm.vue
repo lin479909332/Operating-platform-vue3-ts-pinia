@@ -121,6 +121,19 @@ let skuParams = reactive<SkuData>({
 
 // 初始化sku数据
 const initSkuData = async (c1Id: CategoryId, c2Id: CategoryId, spu: SpuData) => {
+  // 清空上次残留的数据
+  Object.assign(skuParams, {
+    category3Id: '',
+    spuId: '',
+    tmId: '',
+    skuName: '',
+    price: '',
+    weight: '',
+    skuDesc: '',
+    skuAttrValueList: [],
+    skuSaleAttrValueList: [],
+    skuDefaultImg: '',
+  })
   // 收集新增sku需要的参数
   skuParams.category3Id = spu.category3Id
   skuParams.spuId = spu.id as number

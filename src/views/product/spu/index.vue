@@ -25,7 +25,13 @@
               icon="edit"
               title="修改SPU"
             ></el-button>
-            <el-button size="small" type="info" icon="view" title="查看SKU列表"></el-button>
+            <el-button
+              size="small"
+              type="info"
+              icon="view"
+              title="查看SKU列表"
+              @click="showSku(row)"
+            ></el-button>
             <el-button size="small" type="danger" icon="delete" title="删除SPU"></el-button>
           </template>
         </el-table-column>
@@ -43,13 +49,27 @@
     <SpuForm ref="spu" v-show="scene === 1" @changeScene="changeScene" />
     <!-- 添加Sku子组件 -->
     <SkuForm ref="sku" v-show="scene === 2" @changeScene="changeScene" />
+    <!-- sku列表dialog -->
+    <el-dialog v-model="show" title="sku列表">
+      <el-table :data="skuArr" border>
+        <el-table-column label="序号" type="index" align="center" width="80px"></el-table-column>
+        <el-table-column label="sku名称" prop="skuName"></el-table-column>
+        <el-table-column label="sku价格" prop="price"></el-table-column>
+        <el-table-column label="sku重量" prop="weight"></el-table-column>
+        <el-table-column label="sku图片">
+          <template #="{ row }">
+            <img :src="row.skuDefaultImg" alt="图片缺失" style="width: 100px; height: 100px" />
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </el-card>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { reqGetSpu } from '@/api/product/spu'
-import { HasSpuResponseData, Records } from '@/api/product/spu/type'
+import { reqGetSpu, reqSkuList } from '@/api/product/spu'
+import { HasSpuResponseData, Records, SkuData, SkuInfoData } from '@/api/product/spu/type'
 import SpuForm from './SpuForm.vue'
 import SkuForm from './skuForm.vue'
 import useCategoryStore from '@/store/modules/category'
@@ -76,6 +96,12 @@ let spu = ref<any>()
 
 // skuForm组件实例
 let sku = ref<any>()
+
+// 要查看的sku列表数组
+let skuArr = ref<SkuData[]>([])
+
+// 控制sku列表dialog的显示与隐藏
+let show = ref<boolean>(false)
 
 // 监听仓库的三级分类id发生变化
 watch(
@@ -137,6 +163,17 @@ const addSku = (row: SpuData) => {
   // 切换场景为2
   scene.value = 2
   sku.value.initSkuData(categoryStore.c1Id, categoryStore.c2Id, row)
+}
+
+// 查看sku列表按钮
+const showSku = async (row: SpuData) => {
+  // 显示sku列表dialog
+  show.value = true
+  // 发请求
+  let result: SkuInfoData = await reqSkuList(row.id as number)
+  if (result.code === 200) {
+    skuArr.value = result.data
+  }
 }
 </script>
 

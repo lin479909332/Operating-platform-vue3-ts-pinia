@@ -144,3 +144,8 @@ export interface SkuData {
   //sku图片地址
   skuDefaultImg: string
 }
+
+// 获取SKU数据接口的ts类型
+export interface SkuInfoData extends ResponseData {
+  data: SkuData[]
+}

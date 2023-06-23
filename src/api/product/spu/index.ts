@@ -10,6 +10,7 @@ import type {
   AllSaleAttrResponseData,
   SpuData,
   SkuData,
+  SkuInfoData,
 } from './type'
 
 // SPU相关的API地址
@@ -30,6 +31,8 @@ enum API {
   UPDATESPU_URL = '/admin/product/updateSpuInfo',
   // 追加一个新的SKU
   ADDSKU_URL = '/admin/product/saveSkuInfo',
+  // 查看某一个已有的SPU下全部的sku
+  SKUINFO_URL = '/admin/product/findBySpuId/',
 }
 
 // 获取某一个三级分类下的SPU数据
@@ -66,3 +69,7 @@ export const reqAddOrUpdateSpu = (data: SpuData) => {
 
 // 追加一个新的SKU
 export const reqAddSku = (data: SkuData) => request.post<any, any>(API.ADDSKU_URL, data)
+
+// 查看某一个已有的SPU下全部的sku
+export const reqSkuList = (spuId: number | string) =>
+  request.get<any, SkuInfoData>(API.SKUINFO_URL + spuId)
