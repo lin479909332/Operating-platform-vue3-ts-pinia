@@ -11,7 +11,13 @@
         <el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
         <el-table-column label="SPU操作">
           <template #="{ row }">
-            <el-button size="small" type="primary" icon="plus" title="添加SKU"></el-button>
+            <el-button
+              size="small"
+              type="primary"
+              icon="plus"
+              title="添加SKU"
+              @click="addSku"
+            ></el-button>
             <el-button
               @click="updateSpu(row)"
               size="small"
@@ -36,7 +42,7 @@
     <!-- 添加|修改Spu子组件 -->
     <SpuForm ref="spu" v-show="scene === 1" @changeScene="changeScene" />
     <!-- 添加Sku子组件 -->
-    <SkuForm v-show="scene === 2" />
+    <SkuForm v-show="scene === 2" @changeScene="changeScene" />
   </el-card>
 </template>
 
@@ -121,6 +127,12 @@ const changeScene = (obj: any) => {
     // 重新获取一遍spu 添加返回第一页
     getHasSpu()
   }
+}
+
+// 添加sku按钮
+const addSku = () => {
+  // 切换场景为2
+  scene.value = 2
 }
 </script>
 
