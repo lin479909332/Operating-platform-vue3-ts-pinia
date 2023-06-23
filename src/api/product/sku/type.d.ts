@@ -40,6 +40,10 @@ export interface SkuData {
   skuSaleAttrValueList?: saleAttr[]
   // sku图片地址
   skuDefaultImg: string
+  // 控制sku的上架与下架
+  isSale?: number
+  // sku的id（上下架需要）
+  id?: number
 }
 
 // 获取sku接口返回的数据ts类型

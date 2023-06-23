@@ -23,8 +23,13 @@
       <el-table-column label="价格（元）" width="280px" prop="price"></el-table-column>
       <el-table-column label="操作" width="280px" fixed="right">
         <template #="{ row }">
-          <el-button type="success" size="small" icon="Top"></el-button>
-          <el-button type="primary" size="small" icon="edit"></el-button>
+          <el-button
+            size="small"
+            :type="row.isSale === 1 ? 'warning' : 'success'"
+            :icon="row.isSale === 1 ? 'Bottom' : 'Top'"
+            @click="updateSale(row)"
+          ></el-button>
+          <el-button type="primary" size="small" icon="edit" @click="updateSku"></el-button>
           <el-button type="info" size="small" icon="InfoFilled"></el-button>
           <el-button type="danger" size="small" icon="Delete"></el-button>
         </template>
@@ -43,8 +48,9 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
-import { reqSkuList } from '@/api/product/sku'
+import { reqSkuList, reqSaleSku, reqCancelSale } from '@/api/product/sku'
 import { SkuResponseData, SkuData } from '@/api/product/sku/type'
+import { ElMessage } from 'element-plus'
 // 分页器当前页码
 let pageNo = ref<number>(1)
 
@@ -61,6 +67,7 @@ onMounted(() => {
   getHasSku()
 })
 
+// 获取sku列表的方法
 const getHasSku = async (pager = 1) => {
   pageNo.value = pager
   let result: SkuResponseData = await reqSkuList(pageNo.value, pageSize.value)
@@ -74,6 +81,35 @@ const getHasSku = async (pager = 1) => {
 watch([pageNo, pageSize], () => {
   getHasSku(pageNo.value)
 })
+
+// 更新sku上下架状态
+const updateSale = async (row: SkuData) => {
+  // 如果当前sku的isSale===1,说明当前sku是上架的状态->更新为下架
+  // 否则else情况与上面情况相反
+  if (row.isSale === 1) {
+    // 下架操作
+    await reqCancelSale(row.id as number)
+    // 提示信息
+    ElMessage({ type: 'success', message: '下架成功' })
+    // 发请求获取当前更新完毕的全部已有的SKU
+    getHasSku(pageNo.value)
+  } else {
+    // 上架操作
+    await reqSaleSku(row.id as number)
+    // 提示信息
+    ElMessage({ type: 'success', message: '上架成功' })
+    // 发请求获取当前更新完毕的全部已有的SKU
+    getHasSku(pageNo.value)
+  }
+}
+
+// 编辑sku按钮（开发中）
+const updateSku = () => {
+  ElMessage({
+    type: 'info',
+    message: '正在开发中，敬请期待......',
+  })
+}
 </script>
 
 <style lang="less" scoped></style>
