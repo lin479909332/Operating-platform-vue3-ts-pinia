@@ -65,14 +65,14 @@
       <h4>添加用户</h4>
     </template>
     <template #default>
-      <el-form label-width="80px">
-        <el-form-item label="用户名">
+      <el-form label-width="80px" :model="userParams" :rules="rules" ref="formRef">
+        <el-form-item label="用户名" prop="username">
           <el-input placeholder="请输入用户名" v-model="userParams.username"></el-input>
         </el-form-item>
-        <el-form-item label="用户昵称">
+        <el-form-item label="用户昵称" prop="name">
           <el-input placeholder="请输入用户昵称" v-model="userParams.name"></el-input>
         </el-form-item>
-        <el-form-item label="用户密码">
+        <el-form-item label="用户密码" prop="password">
           <el-input placeholder="请输入密码" v-model="userParams.password"></el-input>
         </el-form-item>
       </el-form>
@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, nextTick } from 'vue'
 import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user'
 import { UserResponseDate, Records, User } from '@/api/acl/user/type'
 import { ElMessage } from 'element-plus'
@@ -105,6 +105,9 @@ let userArr = ref<Records>([])
 
 // 控制抽屉的显示与隐藏
 let drawer = ref<boolean>(false)
+
+// form表单实例
+let formRef = ref<any>()
 
 // 存储添加|修改用户需要的数据
 let userParams = reactive<User>({
@@ -135,6 +138,8 @@ watch([pageNo, pageSize], () => {
 
 // 添加用户按钮
 const addUser = () => {
+  // 打开抽屉
+  drawer.value = true
   // 清空数据
   Object.assign(userParams, {
     id: '',
@@ -142,8 +147,10 @@ const addUser = () => {
     name: '',
     password: '',
   })
-  // 打开抽屉
-  drawer.value = true
+  // 清除上一次的校验规则警告（也会清空掉表单数据）
+  nextTick(() => {
+    formRef.value.resetFields()
+  })
 }
 
 // 编辑用户按钮
@@ -158,6 +165,7 @@ const cancel = () => {
 
 // 抽屉确认按钮
 const save = async () => {
+  await formRef.value.validate()
   // 打开抽屉
   drawer.value = true
   let result: any = await reqAddOrUpdateUser(userParams)
@@ -178,6 +186,43 @@ const save = async () => {
     // 关闭抽屉
     drawer.value = false
   }
+}
+
+// 针对用户名的校验规则
+const validatorUsername = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 5) {
+    callBack()
+  } else {
+    callBack(new Error('用户名不得少于5位'))
+  }
+}
+
+// 针对用户昵称的校验规则
+const validatorName = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 5) {
+    callBack()
+  } else {
+    callBack(new Error('用户昵称不得少于5位'))
+  }
+}
+
+// 针对密码的校验规则
+const validatorPassword = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 6) {
+    callBack()
+  } else {
+    callBack(new Error('密码不得少于6位'))
+  }
+}
+
+// 表单校验规则对象
+const rules = {
+  // 用户名
+  username: [{ required: true, trigger: 'change', validator: validatorUsername }],
+  // 用户昵称
+  name: [{ required: true, trigger: 'change', validator: validatorName }],
+  // 密码
+  password: [{ required: true, trigger: 'change', validator: validatorPassword }],
 }
 </script>
 
