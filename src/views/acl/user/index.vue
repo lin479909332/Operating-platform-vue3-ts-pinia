@@ -45,7 +45,9 @@
       <el-table-column label="操作" align="center">
         <template #="{ row }">
           <el-button type="primary" icon="user" size="small">分配角色</el-button>
-          <el-button type="warning" icon="edit" size="small" @click="updateUser">编辑</el-button>
+          <el-button type="warning" icon="edit" size="small" @click="updateUser(row)">
+            编辑
+          </el-button>
           <el-button type="danger" icon="delete" size="small">删除</el-button>
         </template>
       </el-table-column>
@@ -62,7 +64,7 @@
   <!-- 抽屉 -->
   <el-drawer v-model="drawer">
     <template #header>
-      <h4>添加用户</h4>
+      <h4>{{ userParams.id ? '编辑用户' : '添加用户' }}</h4>
     </template>
     <template #default>
       <el-form label-width="80px" :model="userParams" :rules="rules" ref="formRef">
@@ -72,7 +74,7 @@
         <el-form-item label="用户昵称" prop="name">
           <el-input placeholder="请输入用户昵称" v-model="userParams.name"></el-input>
         </el-form-item>
-        <el-form-item label="用户密码" prop="password">
+        <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
           <el-input placeholder="请输入密码" v-model="userParams.password"></el-input>
         </el-form-item>
       </el-form>
@@ -142,7 +144,7 @@ const addUser = () => {
   drawer.value = true
   // 清空数据
   Object.assign(userParams, {
-    id: '',
+    id: 0,
     username: '',
     name: '',
     password: '',
@@ -154,8 +156,15 @@ const addUser = () => {
 }
 
 // 编辑用户按钮
-const updateUser = () => {
+const updateUser = (row: User) => {
+  // 打开抽屉
   drawer.value = true
+  // 把当前行的用户信息赋值给userParams
+  Object.assign(userParams, row)
+  // 清除上一次的校验规则警告（也会清空掉表单数据）
+  nextTick(() => {
+    formRef.value.resetFields()
+  })
 }
 
 // 抽屉取消按钮
@@ -177,7 +186,9 @@ const save = async () => {
     // 关闭抽屉
     drawer.value = false
     // 重新获取一次数据
-    getHasUser()
+    getHasUser(userParams.id ? pageNo.value : 1)
+    // 如果用户修改了当前登录的账号 重新刷新一次页面
+    window.location.reload()
   } else {
     ElMessage({
       type: 'error',
