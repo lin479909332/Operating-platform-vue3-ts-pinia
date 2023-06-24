@@ -11,7 +11,7 @@
     </el-form>
   </el-card>
   <el-card style="margin: 10px 0">
-    <el-button type="primary">添加</el-button>
+    <el-button type="primary" @click="addUser">添加</el-button>
     <el-button type="danger">批量删除</el-button>
     <el-table border style="margin: 10px 0" :data="userArr">
       <el-table-column align="center" type="selection"></el-table-column>
@@ -45,7 +45,7 @@
       <el-table-column label="操作" align="center">
         <template #="{ row }">
           <el-button type="primary" icon="user" size="small">分配角色</el-button>
-          <el-button type="warning" icon="edit" size="small">编辑</el-button>
+          <el-button type="warning" icon="edit" size="small" @click="updateUser">编辑</el-button>
           <el-button type="danger" icon="delete" size="small">删除</el-button>
         </template>
       </el-table-column>
@@ -59,12 +59,38 @@
       :total="total"
     />
   </el-card>
+  <!-- 抽屉 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4>添加用户</h4>
+    </template>
+    <template #default>
+      <el-form label-width="80px">
+        <el-form-item label="用户名">
+          <el-input placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="用户昵称">
+          <el-input placeholder="请输入用户昵称"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码">
+          <el-input placeholder="请输入密码"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button>取消</el-button>
+        <el-button type="primary">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
 import { reqUserInfo } from '@/api/acl/user'
 import { UserResponseDate, Records } from '@/api/acl/user/type'
+import { tr } from 'element-plus/es/locale'
 // 分页器当前页码
 let pageNo = ref<number>(1)
 
@@ -76,6 +102,9 @@ let total = ref<number>(0)
 
 // 存储全部用户的数组
 let userArr = ref<Records>([])
+
+// 控制抽屉的显示与隐藏
+let drawer = ref<boolean>(false)
 
 // 加载后先获取一次
 onMounted(() => {
@@ -96,6 +125,16 @@ const getHasUser = async (pager = 1) => {
 watch([pageNo, pageSize], () => {
   getHasUser(pageNo.value)
 })
+
+// 添加用户按钮
+const addUser = () => {
+  drawer.value = true
+}
+
+// 编辑用户按钮
+const updateUser = () => {
+  drawer.value = true
+}
 </script>
 
 <style lang="scss" scoped>
