@@ -1,6 +1,6 @@
 // sku模块接口管理
 import request from '@/utils/request'
-import type { SkuResponseData } from './type'
+import type { SkuResponseData, SkuInfoData } from './type'
 
 // sku模块相关的接口地址
 enum API {
@@ -10,6 +10,8 @@ enum API {
   SALE_URL = '/admin/product/onSale/',
   // 下架sku
   CANCELSALE_URL = '/admin/product/cancelSale/',
+  // 获取sku详情
+  SKUINFO_URL = '/admin/product/getSkuInfo/',
 }
 
 // 获取sku
@@ -21,3 +23,6 @@ export const reqSaleSku = (skuId: number) => request.get<any, any>(API.SALE_URL 
 
 // 下架sku
 export const reqCancelSale = (skuId: number) => request.get<any, any>(API.CANCELSALE_URL + skuId)
+
+// 获取sku详情
+export const reqSkuInfo = (skuId: number) => request.get<any, SkuInfoData>(API.SKUINFO_URL + skuId)

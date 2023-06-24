@@ -30,7 +30,7 @@
             @click="updateSale(row)"
           ></el-button>
           <el-button type="primary" size="small" icon="edit" @click="updateSku"></el-button>
-          <el-button type="info" size="small" icon="InfoFilled" @click="showSku"></el-button>
+          <el-button type="info" size="small" icon="InfoFilled" @click="showSku(row)"></el-button>
           <el-button type="danger" size="small" icon="Delete"></el-button>
         </template>
       </el-table-column>
@@ -51,34 +51,48 @@
       <template #default>
         <el-row>
           <el-col :span="6">名称</el-col>
-          <el-col :span="18">456</el-col>
+          <el-col
+            :span="18"
+            style="white-space: pre-wrap; word-wrap: break-word; line-height: 25px"
+          >
+            {{ skuInfo.skuName }}
+          </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">描述</el-col>
-          <el-col :span="18">456</el-col>
+          <el-col
+            :span="18"
+            style="white-space: pre-wrap; word-wrap: break-word; line-height: 25px"
+          >
+            {{ skuInfo.skuDesc }}
+          </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">价格</el-col>
-          <el-col :span="18">456</el-col>
+          <el-col :span="18">{{ skuInfo.price }}</el-col>
         </el-row>
         <el-row>
           <el-col :span="6">平台属性</el-col>
-          <el-col :span="18">
-            <el-tag type="warning" v-for="item in 10">{{ item }}</el-tag>
+          <el-col :span="18" style="white-space: pre-wrap; word-wrap: break-word">
+            <el-tag type="warning" v-for="item in skuInfo.skuAttrValueList" :key="item.id">
+              {{ item.valueName }}
+            </el-tag>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">销售属性</el-col>
-          <el-col :span="18">
-            <el-tag type="danger" v-for="item in 10">{{ item }}</el-tag>
+          <el-col :span="18" style="white-space: pre-wrap; word-wrap: break-word">
+            <el-tag type="danger" v-for="item in skuInfo.skuSaleAttrValueList" :key="item.id">
+              {{ item.saleAttrValueName }}
+            </el-tag>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="6">商品图片</el-col>
           <el-col :span="18">
             <el-carousel :interval="4000" type="card" height="200px">
-              <el-carousel-item v-for="item in 6" :key="item">
-                <h3 text="2xl" justify="center">{{ item }}</h3>
+              <el-carousel-item v-for="item in skuInfo.skuImageList" :key="item.id">
+                <img :src="item.imgUrl" alt="图片缺失" style="width: 100%; height: 100%" />
               </el-carousel-item>
             </el-carousel>
           </el-col>
@@ -90,7 +104,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
-import { reqSkuList, reqSaleSku, reqCancelSale } from '@/api/product/sku'
+import { reqSkuList, reqSaleSku, reqCancelSale, reqSkuInfo } from '@/api/product/sku'
 import { SkuResponseData, SkuData } from '@/api/product/sku/type'
 import { ElMessage } from 'element-plus'
 // 分页器当前页码
@@ -107,6 +121,9 @@ let skuArr = ref<SkuData[]>([])
 
 // 控制抽屉的显示与隐藏
 let drawer = ref<boolean>(false)
+
+// 存储sku详情的数据
+let skuInfo = ref<SkuData>({})
 
 onMounted(() => {
   getHasSku()
@@ -157,8 +174,14 @@ const updateSku = () => {
 }
 
 // 查看商品详情按钮
-const showSku = () => {
+const showSku = async (row: SkuData) => {
+  // 切换抽屉的显示
   drawer.value = true
+  // 发请求
+  let result = await reqSkuInfo(row.id as number)
+  if (result.code === 200) {
+    skuInfo.value = result.data
+  }
 }
 </script>
 
