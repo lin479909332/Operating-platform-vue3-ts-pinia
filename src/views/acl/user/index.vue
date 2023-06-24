@@ -44,7 +44,9 @@
       ></el-table-column>
       <el-table-column label="操作" align="center">
         <template #="{ row }">
-          <el-button type="primary" icon="user" size="small">分配角色</el-button>
+          <el-button type="primary" icon="user" size="small" @click="setRole(row)">
+            分配职位
+          </el-button>
           <el-button type="warning" icon="edit" size="small" @click="updateUser(row)">
             编辑
           </el-button>
@@ -61,7 +63,7 @@
       :total="total"
     />
   </el-card>
-  <!-- 抽屉 -->
+  <!-- 抽屉 添加|修改用户 -->
   <el-drawer v-model="drawer">
     <template #header>
       <h4>{{ userParams.id ? '编辑用户' : '添加用户' }}</h4>
@@ -86,6 +88,39 @@
       </div>
     </template>
   </el-drawer>
+  <!-- 抽屉 分配角色 -->
+  <el-drawer v-model="drawer1">
+    <template #header>
+      <h4>分配职位</h4>
+    </template>
+    <template #default>
+      <el-form>
+        <el-form-item label="用户名">
+          <el-input v-model="userParams.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="分配职位">
+          <el-checkbox @change="handleCheckAllChange" :indeterminate="isIndeterminate">
+            全选
+          </el-checkbox>
+          <el-checkbox-group
+            v-model="userRole"
+            @change="handleCheckedCitiesChange"
+            style="display: flex; flex-wrap: wrap"
+          >
+            <el-checkbox v-for="(item, index) in allRole" :key="index" :label="index">
+              {{ item }}
+            </el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <!-- <el-button @click="cancelClick">cancel</el-button> -->
+        <!-- <el-button type="primary" @click="confirmClick">confirm</el-button> -->
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -105,11 +140,14 @@ let total = ref<number>(0)
 // 存储全部用户的数组
 let userArr = ref<Records>([])
 
-// 控制抽屉的显示与隐藏
+// 控制用户抽屉的显示与隐藏
 let drawer = ref<boolean>(false)
 
 // form表单实例
 let formRef = ref<any>()
+
+// 控制分配角色抽屉的显示与隐藏
+let drawer1 = ref<boolean>(false)
 
 // 存储添加|修改用户需要的数据
 let userParams = reactive<User>({
@@ -167,12 +205,12 @@ const updateUser = (row: User) => {
   })
 }
 
-// 抽屉取消按钮
+// 用户抽屉取消按钮
 const cancel = () => {
   drawer.value = false
 }
 
-// 抽屉确认按钮
+// 用户抽屉确认按钮
 const save = async () => {
   await formRef.value.validate()
   // 打开抽屉
@@ -186,7 +224,7 @@ const save = async () => {
     // 关闭抽屉
     drawer.value = false
     // 重新获取一次数据
-    getHasUser(userParams.id ? pageNo.value : 1)
+    // getHasUser(userParams.id ? pageNo.value : 1)
     // 如果用户修改了当前登录的账号 重新刷新一次页面
     window.location.reload()
   } else {
@@ -234,6 +272,36 @@ const rules = {
   name: [{ required: true, trigger: 'change', validator: validatorName }],
   // 密码
   password: [{ required: true, trigger: 'change', validator: validatorPassword }],
+}
+
+// 分配职位按钮
+const setRole = (row: User) => {
+  // 打开抽屉
+  drawer1.value = true
+  // 获取当前row赋值给userParams
+  Object.assign(userParams, row)
+}
+
+//收集顶部复选框全选数据
+const checkAll = ref<boolean>(false)
+let allRole = ref(['销售', '前端', '后端', '测试', '运维', '管理', '管理', '管理', '管理'])
+let userRole = ref(['销售', '前端'])
+// 控制顶部全选复选框不确定的样式
+const isIndeterminate = ref<boolean>(true)
+// 顶部的全部复选框的change事件
+const handleCheckAllChange = (val: boolean) => {
+  // val:true(全选)|false(没有全选)
+  userRole.value = val ? allRole.value : []
+  // 不确定的样式(确定样式)
+  isIndeterminate.value = false
+}
+// 顶部全部的复选框的change事件
+const handleCheckedCitiesChange = (value: string[]) => {
+  // 已经勾选的项目的长度
+  const checkedCount = value.length
+  checkAll.value = checkedCount === allRole.value.length
+  // 顶部复选框不确定的样式(确定样式)
+  isIndeterminate.value = !(checkedCount === allRole.value.length)
 }
 </script>
 
