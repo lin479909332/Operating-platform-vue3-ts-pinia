@@ -67,30 +67,30 @@
     <template #default>
       <el-form label-width="80px">
         <el-form-item label="用户名">
-          <el-input placeholder="请输入用户名"></el-input>
+          <el-input placeholder="请输入用户名" v-model="userParams.username"></el-input>
         </el-form-item>
         <el-form-item label="用户昵称">
-          <el-input placeholder="请输入用户昵称"></el-input>
+          <el-input placeholder="请输入用户昵称" v-model="userParams.name"></el-input>
         </el-form-item>
         <el-form-item label="用户密码">
-          <el-input placeholder="请输入密码"></el-input>
+          <el-input placeholder="请输入密码" v-model="userParams.password"></el-input>
         </el-form-item>
       </el-form>
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button>取消</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="save">确定</el-button>
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
-import { reqUserInfo } from '@/api/acl/user'
-import { UserResponseDate, Records } from '@/api/acl/user/type'
-import { tr } from 'element-plus/es/locale'
+import { ref, onMounted, watch, reactive } from 'vue'
+import { reqUserInfo, reqAddOrUpdateUser } from '@/api/acl/user'
+import { UserResponseDate, Records, User } from '@/api/acl/user/type'
+import { ElMessage } from 'element-plus'
 // 分页器当前页码
 let pageNo = ref<number>(1)
 
@@ -105,6 +105,13 @@ let userArr = ref<Records>([])
 
 // 控制抽屉的显示与隐藏
 let drawer = ref<boolean>(false)
+
+// 存储添加|修改用户需要的数据
+let userParams = reactive<User>({
+  username: '',
+  name: '',
+  password: '',
+})
 
 // 加载后先获取一次
 onMounted(() => {
@@ -128,12 +135,49 @@ watch([pageNo, pageSize], () => {
 
 // 添加用户按钮
 const addUser = () => {
+  // 清空数据
+  Object.assign(userParams, {
+    id: '',
+    username: '',
+    name: '',
+    password: '',
+  })
+  // 打开抽屉
   drawer.value = true
 }
 
 // 编辑用户按钮
 const updateUser = () => {
   drawer.value = true
+}
+
+// 抽屉取消按钮
+const cancel = () => {
+  drawer.value = false
+}
+
+// 抽屉确认按钮
+const save = async () => {
+  // 打开抽屉
+  drawer.value = true
+  let result: any = await reqAddOrUpdateUser(userParams)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: userParams.id ? '修改用户成功' : '添加用户成功',
+    })
+    // 关闭抽屉
+    drawer.value = false
+    // 重新获取一次数据
+    getHasUser()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: userParams.id ? '修改用户失败' : '添加用户失败',
+    })
+    // 关闭抽屉
+    drawer.value = false
+  }
 }
 </script>
 
