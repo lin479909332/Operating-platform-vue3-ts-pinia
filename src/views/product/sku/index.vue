@@ -30,7 +30,7 @@
             @click="updateSale(row)"
           ></el-button>
           <el-button type="primary" size="small" icon="edit" @click="updateSku"></el-button>
-          <el-button type="info" size="small" icon="InfoFilled"></el-button>
+          <el-button type="info" size="small" icon="InfoFilled" @click="showSku"></el-button>
           <el-button type="danger" size="small" icon="Delete"></el-button>
         </template>
       </el-table-column>
@@ -43,6 +43,48 @@
       layout="prev, pager, next, jumper, ->, total, sizes"
       :total="total"
     />
+    <!-- 抽屉组件 -->
+    <el-drawer v-model="drawer">
+      <template #header>
+        <h4>查看商品详情</h4>
+      </template>
+      <template #default>
+        <el-row>
+          <el-col :span="6">名称</el-col>
+          <el-col :span="18">456</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">描述</el-col>
+          <el-col :span="18">456</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">价格</el-col>
+          <el-col :span="18">456</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">平台属性</el-col>
+          <el-col :span="18">
+            <el-tag type="warning" v-for="item in 10">{{ item }}</el-tag>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">销售属性</el-col>
+          <el-col :span="18">
+            <el-tag type="danger" v-for="item in 10">{{ item }}</el-tag>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">商品图片</el-col>
+          <el-col :span="18">
+            <el-carousel :interval="4000" type="card" height="200px">
+              <el-carousel-item v-for="item in 6" :key="item">
+                <h3 text="2xl" justify="center">{{ item }}</h3>
+              </el-carousel-item>
+            </el-carousel>
+          </el-col>
+        </el-row>
+      </template>
+    </el-drawer>
   </el-card>
 </template>
 
@@ -62,6 +104,9 @@ let total = ref<number>(0)
 
 // sku列表数组
 let skuArr = ref<SkuData[]>([])
+
+// 控制抽屉的显示与隐藏
+let drawer = ref<boolean>(false)
 
 onMounted(() => {
   getHasSku()
@@ -110,6 +155,33 @@ const updateSku = () => {
     message: '正在开发中，敬请期待......',
   })
 }
+
+// 查看商品详情按钮
+const showSku = () => {
+  drawer.value = true
+}
 </script>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped>
+.el-carousel__item h3 {
+  color: #475669;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+  text-align: center;
+}
+
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+.el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
+.el-row {
+  margin: 30px 0;
+  .el-tag {
+    margin: 5px;
+  }
+}
+</style>
