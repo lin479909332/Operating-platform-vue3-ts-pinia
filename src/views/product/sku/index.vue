@@ -147,7 +147,7 @@ const getHasSku = async (pager = 1) => {
   }
 }
 
-// pageNo 已被双向绑定所以这里监听 pageNo 变化发请求即可 limit 同理
+// pageNo 已被双向绑定所以这里监听 pageNo 变化发请求即可 pageSize 同理
 watch([pageNo, pageSize], () => {
   getHasSku(pageNo.value)
 })
