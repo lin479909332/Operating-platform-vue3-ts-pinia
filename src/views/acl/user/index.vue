@@ -12,8 +12,10 @@
   </el-card>
   <el-card style="margin: 10px 0">
     <el-button type="primary" @click="addUser">添加</el-button>
-    <el-button type="danger">批量删除</el-button>
-    <el-table border style="margin: 10px 0" :data="userArr">
+    <el-button type="danger" :disabled="!selectArrId.length" @click="deleteSelectUser">
+      批量删除
+    </el-button>
+    <el-table border style="margin: 10px 0" :data="userArr" @selection-change="selectChange">
       <el-table-column align="center" type="selection"></el-table-column>
       <el-table-column label="序号" align="center" type="index" width="150px"></el-table-column>
       <el-table-column label="id" align="center" width="150px" prop="id"></el-table-column>
@@ -51,7 +53,15 @@
           <el-button type="warning" icon="edit" size="small" @click="updateUser(row)">
             编辑
           </el-button>
-          <el-button type="danger" icon="delete" size="small">删除</el-button>
+          <el-popconfirm
+            :title="`你确定要删除${row.username}吗？`"
+            width="260px"
+            @confirm="deleteUser(row.id)"
+          >
+            <template #reference>
+              <el-button type="danger" icon="delete" size="small">删除</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -126,7 +136,14 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, reactive, nextTick } from 'vue'
-import { reqUserInfo, reqAddOrUpdateUser, reqAllRole, reqSetUserRole } from '@/api/acl/user'
+import {
+  reqUserInfo,
+  reqAddOrUpdateUser,
+  reqAllRole,
+  reqSetUserRole,
+  reqRemoveUser,
+  reqSelectUser,
+} from '@/api/acl/user'
 import {
   UserResponseDate,
   Records,
@@ -168,6 +185,9 @@ const checkAll = ref<boolean>(false)
 
 // 控制顶部全选复选框不确定的样式
 const isIndeterminate = ref<boolean>(true)
+
+// 存储批量删除用户的id数组
+let selectArrId = ref<User[]>([])
 
 // 存储添加|修改用户需要的数据
 let userParams = reactive<User>({
@@ -350,6 +370,38 @@ const confirmClick = async () => {
       type: 'error',
       message: '分配职位失败',
     })
+  }
+}
+
+// 确定删除用户
+const deleteUser = async (id: number) => {
+  let result = await reqRemoveUser(id)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功',
+    })
+    getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+  }
+}
+
+// 表格复选框变化后的回调
+const selectChange = (value: any) => {
+  selectArrId.value = value
+}
+
+// 批量删除用户的回调
+const deleteSelectUser = async () => {
+  let idList: any = selectArrId.value.map((item) => {
+    return item.id
+  })
+  let result: any = await reqSelectUser(idList)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功',
+    })
+    getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
   }
 }
 </script>
