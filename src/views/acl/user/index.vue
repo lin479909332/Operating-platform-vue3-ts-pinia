@@ -2,11 +2,11 @@
   <el-card style="height: 80px">
     <el-form :inline="true" class="form">
       <el-form-item label="用户名：">
-        <el-input placeholder="请输入用户名"></el-input>
+        <el-input placeholder="请输入用户名" v-model="keyword"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">搜索</el-button>
-        <el-button type="primary" plain>重置</el-button>
+        <el-button type="primary" :disabled="!keyword" @click="search">搜索</el-button>
+        <el-button type="primary" @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -153,6 +153,11 @@ import {
   SetRoleData,
 } from '@/api/acl/user/type'
 import { ElMessage } from 'element-plus'
+import useLayoutSettingStore from '@/store/modules/setting'
+
+// 创建设置相关的仓库
+let layoutSettingStore = useLayoutSettingStore()
+
 // 分页器当前页码
 let pageNo = ref<number>(1)
 
@@ -189,6 +194,9 @@ const isIndeterminate = ref<boolean>(true)
 // 存储批量删除用户的id数组
 let selectArrId = ref<User[]>([])
 
+// 搜索用户的关键字
+let keyword = ref<string>('')
+
 // 存储添加|修改用户需要的数据
 let userParams = reactive<User>({
   username: '',
@@ -201,10 +209,10 @@ onMounted(() => {
   getHasUser()
 })
 
-// 获取全部用户信息
+// 获取全部用户信息(包含搜索用户)
 const getHasUser = async (pager = 1) => {
   pageNo.value = pager
-  let result: UserResponseDate = await reqUserInfo(pageNo.value, pageSize.value)
+  let result: UserResponseDate = await reqUserInfo(pageNo.value, pageSize.value, keyword.value)
   if (result.code === 200) {
     total.value = result.data.total
     userArr.value = result.data.records
@@ -403,6 +411,19 @@ const deleteSelectUser = async () => {
     })
     getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
   }
+}
+
+// 搜索用户的回调
+const search = () => {
+  // 获取用户
+  getHasUser()
+  // 清空输入的用户名
+  keyword.value = ''
+}
+
+// 重置按钮的回调
+const reset = () => {
+  layoutSettingStore.refresh = !layoutSettingStore.refresh
 }
 </script>
 
