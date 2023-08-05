@@ -35,7 +35,7 @@
       ></el-table-column>
       <el-table-column label="操作" align="center">
         <template #="{ row, index }">
-          <el-button type="primary" icon="user">分配权限</el-button>
+          <el-button type="primary" icon="user" @click="setPermissions(row)">分配权限</el-button>
           <el-button type="warning" icon="edit" @click="editRole(row)">编辑</el-button>
           <el-button type="danger" icon="delete">删除</el-button>
         </template>
@@ -50,6 +50,7 @@
       :total="total"
     />
   </el-card>
+  <!-- 添加职位与编辑职位的对话框 -->
   <el-dialog v-model="dialogFormVisible" :title="roleParams.id ? '更新职位' : '添加职位'">
     <el-form :model="roleParams" :rules="rules" ref="form">
       <el-form-item label="职位名称" prop="roleName">
@@ -61,12 +62,48 @@
       <el-button type="primary" @click="save">确定</el-button>
     </template>
   </el-dialog>
+  <!-- 分配权限的抽屉 -->
+  <el-drawer v-model="drawer">
+    <template #header>
+      <h4>分配权限</h4>
+    </template>
+    <template #default>
+      <!-- 树形控件 -->
+      <el-tree
+        ref="tree"
+        :data="menuArr"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="selectArr"
+        :props="defaultProps"
+      />
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="drawer = false">取消</el-button>
+        <el-button type="primary" @click="handler">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, watch, reactive, nextTick } from 'vue'
-import { reqAllRoleList, reqAddOrUpdateRole } from '@/api/acl/role'
-import { RoleResponseData, Records, RoleData } from '@/api/acl/role/type'
+import {
+  reqAllRoleList,
+  reqAddOrUpdateRole,
+  reqAllMenuList,
+  reqSetPermission,
+} from '@/api/acl/role'
+import {
+  RoleResponseData,
+  Records,
+  RoleData,
+  MenuList,
+  MenuResponseData,
+  MenuData,
+} from '@/api/acl/role/type'
 import useLayoutSettingStore from '@/store/modules/setting'
 import { ElMessage } from 'element-plus'
 // 引入骨架仓库
@@ -97,6 +134,24 @@ let roleParams = reactive<RoleData>({
 // 表单组件实例
 let form = ref<any>()
 
+// 控制抽屉的显示与隐藏
+let drawer = ref<boolean>(false)
+
+// 定义数组存储用户权限的数据
+let menuArr = ref<MenuList>([])
+
+//准备一个数组:数组用于存储勾选的节点的ID(四级的)
+let selectArr = ref<number[]>([])
+
+// 树形控件数据
+const defaultProps = {
+  children: 'children',
+  label: 'name',
+}
+
+// 树形组件实例
+let tree = ref<any>()
+
 // 页面挂载后获取角色
 onMounted(() => {
   getHasRole()
@@ -117,6 +172,11 @@ const getHasRole = async (pager = 1) => {
     allRole.value = result.data.records
     // 存储职位总个数
     total.value = result.data.total
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '获取角色失败',
+    })
   }
 }
 
@@ -185,6 +245,71 @@ const save = async () => {
     dialogFormVisible.value = false
     // 重新获取角色
     getHasRole(roleParams.id ? pageNo.value : 1)
+  } else {
+    ElMessage({
+      type: 'error',
+      message: roleParams.id ? '更新失败' : '添加失败',
+    })
+  }
+}
+
+// 分配权限按钮
+const setPermissions = async (row: RoleData) => {
+  // 清空上次的数据
+  Object.assign(roleParams, {
+    roleName: '',
+    id: 0,
+  })
+  // 打开抽屉
+  drawer.value = true
+  //收集当前要分类权限的职位的数据
+  Object.assign(roleParams, row)
+  let result: MenuResponseData = await reqAllMenuList(roleParams.id as number)
+  if (result.code === 200) {
+    menuArr.value = result.data
+    selectArr.value = filterSelectArr(menuArr.value, [])
+  }
+}
+
+const filterSelectArr = (allData: MenuList, initArr: number[]) => {
+  // 获取等级为4且被选中的菜单
+  allData.forEach((item: MenuData) => {
+    if (item.select && item.level == 4) {
+      initArr.push(item.id)
+    }
+    // 递归处理子项
+    if (item.children && item.children.length > 0) {
+      filterSelectArr(item.children, initArr)
+    }
+  })
+  return initArr
+}
+// 权限抽屉确定按钮
+const handler = async () => {
+  // 获取当前职位的id
+  let roleId = roleParams.id as number
+  // 获取选中节点的id
+  let arr = tree.value.getCheckedKeys()
+  // 获取半选中节点的id
+  let arr1 = tree.value.getHalfCheckedKeys()
+  // 拼接两个数组
+  let permissionId = arr.concat(arr1)
+  // 发请求
+  let result: any = await reqSetPermission(roleId, permissionId)
+  if (result.code === 200) {
+    // 关闭抽屉
+    drawer.value = false
+    ElMessage({
+      type: 'success',
+      message: '分配权限成功',
+    })
+    // 刷新页面
+    window.location.reload()
+  } else {
+    ElMessage({
+      type: 'error',
+      message: '分配权限失败',
+    })
   }
 }
 </script>
