@@ -50,24 +50,25 @@
       :total="total"
     />
   </el-card>
-  <el-dialog v-model="dialogFormVisible" title="添加职位">
-    <el-form>
-      <el-form-item label="职位名称">
-        <el-input placeholder="请输入职位名称" />
+  <el-dialog v-model="dialogFormVisible" :title="roleParams.id ? '更新职位' : '添加职位'">
+    <el-form :model="roleParams" :rules="rules" ref="form">
+      <el-form-item label="职位名称" prop="roleName">
+        <el-input placeholder="请输入职位名称" v-model="roleParams.roleName" />
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="dialogFormVisible = false">取消</el-button>
-      <el-button type="primary">确定</el-button>
+      <el-button type="primary" @click="save">确定</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
-import { reqAllRoleList } from '@/api/acl/role'
+import { ref, onMounted, watch, reactive, nextTick } from 'vue'
+import { reqAllRoleList, reqAddOrUpdateRole } from '@/api/acl/role'
 import { RoleResponseData, Records, RoleData } from '@/api/acl/role/type'
 import useLayoutSettingStore from '@/store/modules/setting'
+import { ElMessage } from 'element-plus'
 // 引入骨架仓库
 let settingStore = useLayoutSettingStore()
 // 分页器当前页码
@@ -87,6 +88,14 @@ let allRole = ref<Records>([])
 
 // 对话框的显示与隐藏
 let dialogFormVisible = ref<boolean>(false)
+
+// 收集表单的职位数据
+let roleParams = reactive<RoleData>({
+  roleName: '',
+})
+
+// 表单组件实例
+let form = ref<any>()
 
 // 页面挂载后获取角色
 onMounted(() => {
@@ -126,13 +135,57 @@ const reset = () => {
 
 // 添加角色按钮
 const addRole = () => {
+  // 显示对话框
   dialogFormVisible.value = true
+  // 清空上次的数据
+  Object.assign(roleParams, {
+    roleName: '',
+    id: 0,
+  })
+  // 清除校验规则警告
+  nextTick(() => {
+    form.value.clearValidate('roleName')
+  })
 }
 
 // 编辑角色按钮
 const editRole = (row: RoleData) => {
   dialogFormVisible.value = true
-  console.log(row)
+  Object.assign(roleParams, row)
+  // 清除校验规则警告
+  nextTick(() => {
+    form.value.clearValidate('roleName')
+  })
+}
+
+// 针对职位名称的校验规则
+const validatorRoleName = (_rule: any, value: any, callBack: any) => {
+  if (value.trim().length >= 2) {
+    callBack()
+  } else {
+    callBack(new Error('职位名称不得少于两个字符'))
+  }
+}
+
+// 表单的校验规则
+const rules = {
+  roleName: [{ required: true, trigger: 'blur', validator: validatorRoleName }],
+}
+
+// 表单的确定按钮
+const save = async () => {
+  await form.value.validate()
+  let result: any = await reqAddOrUpdateRole(roleParams)
+  if (result.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: roleParams.id ? '更新成功' : '添加成功',
+    })
+    // 关闭对话框
+    dialogFormVisible.value = false
+    // 重新获取角色
+    getHasRole(roleParams.id ? pageNo.value : 1)
+  }
 }
 </script>
 
