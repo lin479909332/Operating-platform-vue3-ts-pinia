@@ -13,6 +13,8 @@ import globalComponent from '@/components'
 import 'virtual:svg-icons-register'
 //引入模板的全局的样式
 import '@/styles/index.scss'
+// 引入暗黑模式样式
+import 'element-plus/theme-chalk/dark/css-vars.css'
 // 引入路由
 import router from '@/router'
 // 引入仓库

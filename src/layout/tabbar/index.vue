@@ -26,7 +26,8 @@ export default {
   height: 100%;
   display: flex;
   justify-content: space-between;
-  background-color: #0ebedf;
+  border-bottom: 1px solid #eee;
+  // background-color: #0ebedf;
   .tabbar_left {
     display: flex;
     align-items: center;
