@@ -11,7 +11,7 @@
     </el-form>
   </el-card>
   <el-card style="margin: 10px 0">
-    <el-button type="primary" icon="plus">添加角色</el-button>
+    <el-button type="primary" icon="plus" @click="addRole">添加角色</el-button>
     <el-table border style="margin: 10px 0" :data="allRole">
       <el-table-column label="#" align="center" type="index" width="150px"></el-table-column>
       <el-table-column label="id" align="center" width="250px" prop="id"></el-table-column>
@@ -36,7 +36,7 @@
       <el-table-column label="操作" align="center">
         <template #="{ row, index }">
           <el-button type="primary" icon="user">分配权限</el-button>
-          <el-button type="warning" icon="edit">编辑</el-button>
+          <el-button type="warning" icon="edit" @click="editRole(row)">编辑</el-button>
           <el-button type="danger" icon="delete">删除</el-button>
         </template>
       </el-table-column>
@@ -50,12 +50,23 @@
       :total="total"
     />
   </el-card>
+  <el-dialog v-model="dialogFormVisible" title="添加职位">
+    <el-form>
+      <el-form-item label="职位名称">
+        <el-input placeholder="请输入职位名称" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="dialogFormVisible = false">取消</el-button>
+      <el-button type="primary">确定</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
 import { reqAllRoleList } from '@/api/acl/role'
-import { RoleResponseData, Records } from '@/api/acl/role/type'
+import { RoleResponseData, Records, RoleData } from '@/api/acl/role/type'
 import useLayoutSettingStore from '@/store/modules/setting'
 // 引入骨架仓库
 let settingStore = useLayoutSettingStore()
@@ -73,6 +84,9 @@ let keyword = ref<string>('')
 
 // 存储全部职位
 let allRole = ref<Records>([])
+
+// 对话框的显示与隐藏
+let dialogFormVisible = ref<boolean>(false)
 
 // 页面挂载后获取角色
 onMounted(() => {
@@ -108,6 +122,17 @@ const search = () => {
 // 重置按钮
 const reset = () => {
   settingStore.refresh = !settingStore.refresh
+}
+
+// 添加角色按钮
+const addRole = () => {
+  dialogFormVisible.value = true
+}
+
+// 编辑角色按钮
+const editRole = (row: RoleData) => {
+  dialogFormVisible.value = true
+  console.log(row)
 }
 </script>
 
