@@ -5,7 +5,12 @@
     <!-- 表单元素 -->
     <el-form>
       <el-form-item label="主题颜色">
-        <el-color-picker v-model="color" show-alpha :predefine="predefineColors" />
+        <el-color-picker
+          @change="changeColor"
+          v-model="color"
+          show-alpha
+          :predefine="predefineColors"
+        />
       </el-form-item>
       <el-form-item label="暗黑模式">
         <el-switch
@@ -102,6 +107,15 @@ const changeDark = () => {
   let html = document.documentElement
   // 根据开关状态决定html标签带不带dark
   dark.value ? (html.className = 'dark') : (html.className = '')
+}
+// 切换主题的回调
+const changeColor = () => {
+  // 获取html根节点
+  let html = document.documentElement
+  // 设置主题颜色
+  html.style.setProperty('--el-color-primary', color.value)
+  html.style.setProperty('--el-color-warning', color.value)
+  html.style.setProperty('--el-color-danger', color.value)
 }
 </script>
 <script lang="ts">
