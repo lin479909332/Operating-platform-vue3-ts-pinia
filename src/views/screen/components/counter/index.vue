@@ -1,0 +1,12 @@
+<template>
+<div>渠道统计</div>
+</template>
+
+<script lang='ts' setup>
+import { } from 'vue'
+
+</script>
+ 
+<style lang="scss" scoped>
+  
+</style>

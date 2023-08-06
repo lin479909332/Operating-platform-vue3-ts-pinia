@@ -57,10 +57,11 @@ onMounted(() => {
       //地图高亮的效果
       emphasis: {
         itemStyle: {
-          color: '##dbeff7',
+          color: '#dbeff7',
         },
         label: {
-          fontSize: 40,
+          fontSize: 25,
+          color: 'red',
         },
       },
     },
