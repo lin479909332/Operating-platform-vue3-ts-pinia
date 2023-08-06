@@ -39,17 +39,6 @@ export const constantRoute = [
           icon: 'HomeFilled',
         },
       },
-      // {
-      //   path: ' /test ',
-      //   component: () => import('@/views/home/index.vue'),
-      //   meta: {
-      //     // 菜单标题
-      //     title: '测试',
-      //     // 是否要在菜单里隐藏
-      //     hidden: false,
-      //     icon: 'Aim',
-      //   },
-      // },
     ],
   },
   {
@@ -75,6 +64,10 @@ export const constantRoute = [
       icon: 'Monitor',
     },
   },
+]
+
+// 异步路由
+export const asyncRoute = [
   {
     path: '/acl',
     component: () => import('@/layout/index.vue'),
@@ -163,6 +156,10 @@ export const constantRoute = [
       },
     ],
   },
+]
+
+// 任意路由
+export const anyRoute = [
   {
     // 任意路由
     path: '/:pathMatch(.*)*',
