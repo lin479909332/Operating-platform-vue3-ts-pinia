@@ -8,6 +8,7 @@ export interface UserState {
   menusRoutes: RouteRecordRaw[]
   username: string
   avatar: string
+  buttons: string[]
 }
 
 // 定义分类仓库state对象的类型

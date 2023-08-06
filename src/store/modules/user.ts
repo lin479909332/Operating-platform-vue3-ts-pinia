@@ -51,6 +51,8 @@ let useUserStore = defineStore('User', {
       username: '',
       // 用户头像
       avatar: '',
+      // 按钮权限数组
+      buttons: [],
     }
   },
   // 处理异步或逻辑的地方
@@ -75,6 +77,7 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.username = result.data.name
         this.avatar = result.data.avatar
+        this.buttons = result.data.buttons
         // 先重置一次路由
         resetRouter()
         // 添加常量路由
