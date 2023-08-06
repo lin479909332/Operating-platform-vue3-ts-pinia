@@ -48,7 +48,7 @@ onMounted(() => {
       waveAnimation: true, //动画
       animationDuration: 3,
       animationDurationUpdate: 0,
-      radius: '100%', //半径
+      radius: '85%', //半径
       outline: {
         //外层边框颜色设置
         show: true,
@@ -119,7 +119,6 @@ onMounted(() => {
   .charts {
     width: 100%;
     height: 250px;
-    background-color: aliceblue;
   }
 }
 </style>

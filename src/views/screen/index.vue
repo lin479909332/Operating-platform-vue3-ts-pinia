@@ -74,11 +74,9 @@ window.onresize = () => {
         }
         .gender {
           flex: 1;
-          background-color: goldenrod;
         }
         .age {
           flex: 1;
-          background-color: bisque;
         }
       }
       .center {
