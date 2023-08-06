@@ -6,7 +6,11 @@
         <Top />
       </div>
       <div class="bottom">
-        <div class="left">左侧</div>
+        <div class="left">
+          <Tourist class="tourist"></Tourist>
+          <Gender class="gender"></Gender>
+          <Age class="age"></Age>
+        </div>
         <div class="center">中间</div>
         <div class="right">右侧</div>
       </div>
@@ -17,6 +21,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import Top from './components/top/index.vue'
+import Tourist from './components/tourist/index.vue'
+import Gender from './components/gender/index.vue'
+import Age from './components/age/index.vue'
 // 获取数据大屏盒子的dom元素
 let screen = ref()
 
@@ -59,6 +66,20 @@ window.onresize = () => {
       display: flex;
       .left {
         flex: 1;
+        height: 1040px;
+        display: flex;
+        flex-direction: column;
+        .tourist {
+          flex: 1.2;
+        }
+        .gender {
+          flex: 1;
+          background-color: goldenrod;
+        }
+        .age {
+          flex: 1;
+          background-color: bisque;
+        }
       }
       .center {
         flex: 2;
