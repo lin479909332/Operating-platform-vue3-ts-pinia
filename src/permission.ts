@@ -13,7 +13,7 @@ import pinia from './store'
 // 这里拿不到要导入pinia
 let userStore = useUserStore(pinia)
 // 全局前置守卫
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
+router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
   // 获取用户token判断用户是否登录
@@ -32,6 +32,9 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
         try {
           // 重新获取用户信息
           await userStore.userInfo()
+          // 放行
+          // next({...to})
+          next({ ...to, replace: true })
         } catch (error) {
           // token过期:获取不到用户信息了或者用户手动修改本地存储token
           // 退出登录并回到首页,并保留要去的path
@@ -53,6 +56,6 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
 })
 
 // 全局后置守卫
-router.afterEach((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+router.afterEach((_to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   nprogress.done()
 })

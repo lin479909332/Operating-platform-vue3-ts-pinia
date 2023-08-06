@@ -10,6 +10,10 @@ import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
 // 引入路由（常量路由）
 import { constantRoute, asyncRoute, anyRoute } from '@/router/routes'
 import router from '@/router'
+// 引入深拷贝方法
+// @ts-ignore
+import cloneDeep from 'lodash/cloneDeep'
+
 // 用于过滤当前用户需要展示的异步路由
 function filterAsyncRoute(asyncRoute: any, routes: any) {
   return asyncRoute.filter((item: any) => {
@@ -19,6 +23,17 @@ function filterAsyncRoute(asyncRoute: any, routes: any) {
       }
       return true
     }
+  })
+}
+
+// 重置路由(先移除所有路由，再添加常量路由)
+function resetRouter() {
+  // 获取所有路由
+  router.getRoutes().forEach((route) => {
+    // 获取路由name
+    const { name } = route
+    // 移除所有路由
+    router.hasRoute(name as string) && router.removeRoute(name as string)
   })
 }
 
@@ -60,8 +75,14 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.username = result.data.name
         this.avatar = result.data.avatar
+        // 先重置一次路由
+        resetRouter()
+        // 添加常量路由
+        ;[...constantRoute].forEach((route: any) => {
+          router.addRoute(route)
+        })
         // 计算当前用户需要展示的异步路由
-        let userAsyncRoute = filterAsyncRoute(asyncRoute, result.data.routes)
+        let userAsyncRoute = filterAsyncRoute(cloneDeep(asyncRoute), result.data.routes)
         // 整理菜单需要的数据
         this.menusRoutes = [...constantRoute, ...userAsyncRoute, ...anyRoute]
         //目前路由器管理的只有常量路由:用户计算完毕异步路由、任意路由动态追加
