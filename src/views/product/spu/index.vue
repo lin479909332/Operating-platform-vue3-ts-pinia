@@ -78,7 +78,7 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { reqGetSpu, reqSkuList, reqRemoveSpu } from '@/api/product/spu'
 import { HasSpuResponseData, Records, SkuData, SkuInfoData } from '@/api/product/spu/type'
-import SpuForm from './SpuForm.vue'
+import SpuForm from './spuForm.vue'
 import SkuForm from './skuForm.vue'
 import useCategoryStore from '@/store/modules/category'
 import type { SpuData } from '@/api/product/spu/type'
