@@ -1,12 +1,9 @@
 <template>
-<div>渠道统计</div>
+  <div>渠道统计</div>
 </template>
 
-<script lang='ts' setup>
-import { } from 'vue'
-
+<script lang="ts" setup>
+import {} from 'vue'
 </script>
- 
-<style lang="scss" scoped>
-  
-</style>
+
+<style lang="scss" scoped></style>
