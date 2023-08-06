@@ -8,7 +8,20 @@ import { reqLogin, reqUserInfo, reqLogout } from '@/api/user/index'
 // 存储 读取token的方法
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
 // 引入路由（常量路由）
-import { constantRoute } from '@/router/routes'
+import { constantRoute, asyncRoute, anyRoute } from '@/router/routes'
+import router from '@/router'
+// 用于过滤当前用户需要展示的异步路由
+function filterAsyncRoute(asyncRoute: any, routes: any) {
+  return asyncRoute.filter((item: any) => {
+    if (routes.includes(item.name)) {
+      if (item.children && item.children.length > 0) {
+        item.children = filterAsyncRoute(item.children, routes)
+      }
+      return true
+    }
+  })
+}
+
 // 创建小仓库
 let useUserStore = defineStore('User', {
   // 小仓库存储数据的地方
@@ -47,6 +60,14 @@ let useUserStore = defineStore('User', {
       if (result.code == 200) {
         this.username = result.data.name
         this.avatar = result.data.avatar
+        // 计算当前用户需要展示的异步路由
+        let userAsyncRoute = filterAsyncRoute(asyncRoute, result.data.routes)
+        // 整理菜单需要的数据
+        this.menusRoutes = [...constantRoute, ...userAsyncRoute, ...anyRoute]
+        //目前路由器管理的只有常量路由:用户计算完毕异步路由、任意路由动态追加
+        ;[...userAsyncRoute, ...anyRoute].forEach((route: any) => {
+          router.addRoute(route)
+        })
         return 'ok'
       } else {
         return Promise.reject(new Error(result.message))

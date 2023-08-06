@@ -71,7 +71,7 @@ export const asyncRoute = [
   {
     path: '/acl',
     component: () => import('@/layout/index.vue'),
-    name: 'acl',
+    name: 'Acl',
     meta: {
       title: '权限管理',
       hidden: false,
