@@ -1,23 +1,25 @@
-// 该服务为 vercel serve跨域处理
-const { createProxyMiddleware } = require('http-proxy-middleware')
+const request = require('request')
 
 module.exports = (req, res) => {
-  let target = ''
-
-  // 代理目标地址
-  // 这里使用 backend 主要用于区分 vercel serverless 的 api 路径
-  // xxxxx 替换为你跨域请求的服务器 如： http://baidu.com
-  if (req.url.startsWith('/api')) {
-    target = 'http://sph-api.atguigu.cn'
+  // proxy middleware options
+  let prefix = '/notion-api'
+  if (!req.url.startsWith(prefix)) {
+    return
   }
-  // 创建代理对象并转发请求
-  createProxyMiddleware({
-    target,
-    changeOrigin: true,
-    pathRewrite: {
-      // 通过路径重写，去除请求路径中的 `/backend`
-      // 例如 /backend/user/login 将被转发到 http://backend-api.com/user/login
-      '/^/api/': '',
+  let target = 'https://api.notion.com' + req.url.substring(prefix.length)
+
+  var options = {
+    method: 'GET',
+    url: target,
+    headers: {
+      'Notion-Version': res.headers['notion-version'],
+      Authorization: res.headers['authorization'],
     },
-  })(req, res)
+  }
+  request(options, function (error, response) {
+    if (error) throw new Error(error)
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.write(response.body)
+    res.end()
+  })
 }
